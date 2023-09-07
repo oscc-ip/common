@@ -6,34 +6,40 @@ interface apb4_if #(
     input logic presetn
 );
 
-  logic [ APB_ADDR_WIDTH-1:0] paddr;
-  logic [ APB_DATA_WIDTH-1:0] pwdata;
-  logic                       pwrite;
-  logic                       psel;
-  logic                       penable;
-  logic [ APB_DATA_WIDTH-1:0] prdata;
-  logic                       pready;
-  logic                       pslverr;
+  logic [  APB_ADDR_WIDTH-1:0] paddr;
+  logic [                 2:0] pprot;
+  logic                        psel;
+  logic                        penable;
+  logic                        pwrite;
+  logic [  APB_DATA_WIDTH-1:0] pwdata;
+  logic [APB_DATA_WIDTH/8-1:0] pstrb;
+  logic                        pready;
+  logic [  APB_DATA_WIDTH-1:0] prdata;
+  logic                        pslverr;
 
   modport slave(
       input paddr,
-      input pwdata,
-      input pwrite,
+      input pprot,
       input psel,
       input penable,
-      output prdata,
+      input pwrite,
+      input pwdata,
+      input pstrb,
       output pready,
+      output prdata,
       output pslverr
   );
 
   modport master(
       output paddr,
-      output pwdata,
-      output pwrite,
+      output pprot,
       output psel,
       output penable,
-      input prdata,
+      output pwrite,
+      output pwdata,
+      output pstrb,
       input pready,
+      input prdata,
       input pslverr
   );
 
