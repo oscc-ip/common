@@ -15,11 +15,8 @@ module gray2bin #(
     input logic [DATA_WIDTH-1:0] bin_o
 );
 
-  assign bin_o[DATA_WIDTH-1] = gray_i[DATA_WIDTH-1];
-  genvar i;
-  generate
-    for (i = 0; i < DATA_WIDTH - 1; i++) begin
-      assign bin_o[i] = bin_o[i+1] ^ gray_i[i];
+    for (genvar i = 0; i < DATA_WIDTH; i++) begin
+      assign bin_o[i] = ^gray_i[DATA_WIDTH-1:i];
     end
   endgenerate
 endmodule
