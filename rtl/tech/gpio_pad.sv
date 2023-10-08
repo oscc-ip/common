@@ -1,0 +1,48 @@
+// Copyright (c) 2023 Beijing Institute of Open Source Chip
+// common is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//             http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+// EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+// MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
+// this file only include digital IO's behavioral model, for ASIC tape-out need to reimplement those models
+
+module tri_pd_pad (
+    input  logic i_i,
+    input  logic oen_i,
+    input  logic ren_i,
+    output logic c_o,
+    inout  wire  pad_io
+);
+
+  assign pad_io = oen_i ? 1'bz : i_i;
+  assign c_o    = pad_io;
+endmodule
+
+module tri_pu_pad (
+    input  logic i_i,
+    input  logic oen_i,
+    input  logic ren_i,
+    output logic c_o,
+    inout  wire  pad_io
+);
+
+  assign pad_io = oen_i ? 1'bz : i_i;
+  assign c_o    = pad_io;
+endmodule
+
+module osc_pad (
+    input  logic ds0_i,   // driver strength
+    input  logic ds1_i,   // driver strength
+    input  logic en_i,
+    input  logic xin_i,
+    output logic xout_o,
+    output logic xc_o
+);
+
+  assign xout_o = en_i ? xin_i : 1'b0;
+  assign xc_o   = en_i ? xin_i : 1'b0;
+endmodule
