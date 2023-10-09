@@ -22,39 +22,62 @@
 // See the Mulan PSL v2 for more details.
 
 module clk_int_even_div_static #(
-    parameter int DIV_VALUE             = 1,
-    parameter bit ENABLE_CLOCK_IN_RESET = 1'b1
+    parameter int DIV_VALUE = 2
 ) (
     input  logic clk_i,
     input  logic rst_n_i,
-    input  logic en_i,
-    input  logic test_mode_i,
     output logic clk_o
 );
   if (DIV_VALUE <= 0 || DIV_VALUE % 2) begin
     $error("DIV_VALUE must be strictly larger than 0 and be even value");
   end
 
-  localparam int DIV_VALUE_WIDTH = $clog2(DIV_VALUE + 1);
+  localparam int DIV_VALUE_WIDTH = $clog2(DIV_VALUE) + 1;
+  logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q;
+  logic s_clk_d, s_clk_q;
 
-  logic [DIV_VALUE_WIDTH-1:0] div_i;
-  assign div_i = DIV_VALUE;
+  always_comb begin
+    s_cnt_d = s_cnt_q + 1'b1;
+    if (s_cnt_q == DIV_VALUE / 2 - 1) begin
+      s_cnt_d = '0;
+    end
+  end
 
-  clk_int_even_div #(
-      .DIV_VALUE            (DIV_VALUE),
-      .DIV_VALUE_WIDTH      (DIV_VALUE_WIDTH),
-      .ENABLE_CLOCK_IN_RESET(ENABLE_CLOCK_IN_RESET)
-  ) uclk_int_div (
-      .clk_i,
-      .rst_n_i,
-      .en_i,
-      .test_mode_i,
-      .div_i,
-      .div_valid_i (1'b0),
-      .div_ready_o (),
-      .clk_o,
-      .cycl_count_o()
+  dffr #(DIV_VALUE_WIDTH) u_cnt_dffr (
+      clk_i,
+      rst_n_i,
+      s_cnt_d,
+      s_cnt_q
   );
+
+  always_comb begin
+    s_clk_d = s_clk_q;
+    if (s_cnt_q == DIV_VALUE / 2 - 1) begin
+      s_clk_d = ~s_clk_q;
+    end
+  end
+
+  dffr #(1) u_clk_dffr (
+      clk_i,
+      rst_n_i,
+      s_clk_d,
+      s_clk_q
+  );
+
+  assign clk_o = s_clk_q;
+endmodule
+
+module clk_int_odd_div_static #(
+    parameter int DIV_VALUE = 1
+) (
+    input  logic clk_i,
+    input  logic rst_n_i,
+    output logic clk_o
+);
+  if (DIV_VALUE <= 0 || DIV_VALUE % 2 == 0) begin
+    $error("DIV_VALUE must be strictly larger than 0 and be odd value");
+  end
+
 
 endmodule
 
@@ -65,7 +88,6 @@ module clk_int_even_div #(
     input  logic clk_i,
     input  logic rst_n_i,
     input  logic en_i,
-    input  logic test_mode_i,
     input  logic div_i,
     input  logic div_valid_i,
     output logic div_ready_o,
