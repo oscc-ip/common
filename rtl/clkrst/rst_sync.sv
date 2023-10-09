@@ -1,5 +1,5 @@
 // Copyright (c) 2023 Beijing Institute of Open Source Chip
-// common is licensed under Mulan PSL v2.
+// timer is licensed under Mulan PSL v2.
 // You can use this software according to the terms and conditions of the Mulan PSL v2.
 // You may obtain a copy of Mulan PSL v2 at:
 //             http://license.coscl.org.cn/MulanPSL2
@@ -8,34 +8,33 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-module sync #(
-    parameter int STAGE      = 2,
-    parameter int DATA_WIDTH = 1
+module rst_sync #(
+    parameter int STAGE = 3
 ) (
-    input  logic                  clk_i,
-    input  logic                  rst_n_i,
-    input  logic [DATA_WIDTH-1:0] dat_i,
-    output logic [DATA_WIDTH-1:0] dat_o
+    input  logic clk_i,
+    input  logic rst_n_i,
+    output logic rst_n_o
 );
 
-  logic [DATA_WIDTH-1:0] s_sync_dat[0:STAGE-1];
+  logic [STAGE-1:0] s_rst_sync;
   for (genvar i = 0; i < STAGE; i++) begin
     if (i == 0) begin
-      dffr #(DATA_WIDTH) u_sync_dffr (
+      dffr #(1) u_sync_dffr (
           clk_i,
           rst_n_i,
-          dat_i,
-          s_sync_dat[0]
+          1'b1,
+          s_rst_sync[0]
       );
     end else begin
-      dffr #(DATA_WIDTH) u_sync_dffr (
+      dffr #(1) u_sync_dffr (
           clk_i,
           rst_n_i,
-          s_sync_dat[i-1],
-          s_sync_dat[i]
+          s_rst_sync[i-1],
+          s_rst_sync[i]
       );
     end
   end
 
-  assign dat_o = s_sync_dat[STAGE-1];
+  assign rst_n_o = s_rst_sync[STAGE-1];
+  
 endmodule
