@@ -10,55 +10,89 @@
 
 // this file only include behavioral model, for ASIC tape-out need to reimplement those models
 module clk_buf (
-    input  logic i_i,
-    output logic z_o
+    input  logic clk_i,
+    output logic clk_o
 );
 
-  assign z_o = i_i;
+  assign clk_o = clk_i;
 endmodule
 
 module clk_n (
-    input  logic i_i,
-    output logic zn_o
+    input  logic clk_i,
+    output logic clk_o
 );
 
-  assign zn_o = ~i_i;
+  assign clk_o = ~clk_i;
 endmodule
 
 module clk_an2 (
-    input  logic a1_i,
-    input  logic a2_i,
-    output logic z_o
+    input  logic clk1_i,
+    input  logic clk2_i,
+    output logic clk_o
 );
 
-  assign z_o = a1_i & a2_i;
+  assign clk_o = clk1_i & clk2_i;
 endmodule
 
 
 module clk_nd2 (
-    input  logic a1_i,
-    input  logic a2_i,
-    output logic z_o
+    input  logic clk1_i,
+    input  logic clk2_i,
+    output logic clk_o
 );
 
-  assign z_o = ~(a1_i & a2_i);
+  assign clk_o = ~(clk1_i & clk2_i);
 endmodule
 
 module clk_mux2 (
-    input  logic a1_i,
-    input  logic a2_i,
-    input  logic s_i,
-    output logic z_o
+    input  logic clk1_i,
+    input  logic clk2_i,
+    input  logic en_i,
+    output logic clk_o
 );
 
-  assign z_o = s_i ? a2_i : a1_i;
+  assign clk_o = en_i ? clk2_i : clk1_i;
 endmodule
 
 module clk_xor2 (
-    input  logic a1_i,
-    input  logic a2_i,
-    output logic z_o
+    input  logic clk1_i,
+    input  logic clk2_i,
+    output logic clk_o
 );
 
-  assign z_o = a1_i ^ a2_i;
+  assign clk_o = clk1_i ^ clk2_i;
+endmodule
+
+module clk_icg (
+    input  logic clk_i,
+    input  logic en_i,
+    input  logic te_i,
+    output logic clk_o
+);
+
+  logic r_clk_en;
+  always_latch begin
+    if (clk_i == 1'b0) begin
+      r_clk_en <= en_i | te_i;
+    end
+  end
+
+  assign clk_o = clk_i & r_clk_en;
+endmodule
+
+module clk_icg2 (
+    input  logic clk_i,
+    input  logic en_i,
+    input  logic te_i,
+    output logic clk_o
+);
+
+  logic r_clk_en;
+  always_latch begin
+    if (clk_i == 1'b1) begin
+      r_clk_en <= en_i | te_i;
+    end
+  end
+
+  assign clk_o = clk_i | (~r_clk_en);
 endmodule
