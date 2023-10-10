@@ -39,6 +39,24 @@ module dffr #(
   end
 endmodule
 
+module ndffr #(
+    parameter int DATA_WIDTH = 1
+) (
+    input  logic                  clk_i,
+    input  logic                  rst_n_i,
+    input  logic [DATA_WIDTH-1:0] dat_i,
+    output logic [DATA_WIDTH-1:0] dat_o
+);
+
+  always_ff @(negedge clk_i, negedge rst_n_i) begin
+    if (~rst_n_i) begin
+      dat_o <= '0;
+    end else begin
+      dat_o <= dat_i;
+    end
+  end
+endmodule
+
 module dffrh #(
     parameter int DATA_WIDTH = 1
 ) (

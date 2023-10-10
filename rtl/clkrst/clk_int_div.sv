@@ -64,21 +64,72 @@ module clk_int_even_div_static #(
       s_clk_q
   );
 
+  //   clk_buf(s_clk_q, clk_o);
   assign clk_o = s_clk_q;
 endmodule
 
 module clk_int_odd_div_static #(
-    parameter int DIV_VALUE = 1
+    parameter int DIV_VALUE = 3
 ) (
     input  logic clk_i,
     input  logic rst_n_i,
     output logic clk_o
 );
-  if (DIV_VALUE <= 0 || DIV_VALUE % 2 == 0) begin
+  if (DIV_VALUE < 2 || DIV_VALUE % 2 == 0) begin
     $error("DIV_VALUE must be strictly larger than 0 and be odd value");
   end
 
+  localparam int DIV_VALUE_WIDTH = $clog2(DIV_VALUE) + 1;
+  logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q;
+  logic s_clk1_d, s_clk1_q, s_clk2_d, s_clk2_q;
 
+  always_comb begin
+    s_cnt_d = s_cnt_q + 1'b1;
+    if (s_cnt_q == DIV_VALUE - 1) begin
+      s_cnt_d = '0;
+    end
+  end
+
+  dffr #(DIV_VALUE_WIDTH) u_cnt_dffr (
+      clk_i,
+      rst_n_i,
+      s_cnt_d,
+      s_cnt_q
+  );
+
+  always_comb begin
+    s_clk1_d = s_clk1_q;
+    if (s_cnt_q == (DIV_VALUE - 1) / 2 - 1) begin
+      s_clk1_d = ~s_clk1_q;
+    end
+  end
+
+  dffr #(1) u_clk1_dffr (
+      clk_i,
+      rst_n_i,
+      s_clk1_d,
+      s_clk1_q
+  );
+
+  always_comb begin
+    s_clk2_d = s_clk2_q;
+    if (s_cnt_q == DIV_VALUE - 1) begin
+      s_clk2_d = ~s_clk2_q;
+    end
+  end
+
+  ndffr #(1) u_clk_ndffr (
+      clk_i,
+      rst_n_i,
+      s_clk2_d,
+      s_clk2_q
+  );
+
+  clk_xor2 u_clk_xor2 (
+      s_clk1_q,
+      s_clk2_q,
+      clk_o
+  );
 endmodule
 
 module clk_int_even_div #(
