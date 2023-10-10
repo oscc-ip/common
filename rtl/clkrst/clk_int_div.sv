@@ -132,6 +132,62 @@ module clk_int_odd_div_static #(
   );
 endmodule
 
+module clk_int_even_div_simple #(
+    parameter int DIV_VALUE_WIDTH = 32
+) (
+    input  logic                       clk_i,
+    input  logic                       rst_n_i,
+    input  logic [DIV_VALUE_WIDTH-1:0] div_i,
+    input  logic                       div_valid_i,
+    output logic                       div_ready_o,
+    output logic                       clk_o
+);
+
+  logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q, s_div_d, s_div_q;
+  logic s_clk_d, s_clk_q;
+
+  assign s_div_d = (s_div_q != div_i) ? div_i : s_div_q;
+  always_ff @(posedge clk_i, negedge rst_n_i) begin
+    if (~rst_n_i) begin
+      s_div_q <= {{(DIV_VALUE_WIDTH - 2) {1'b0}}, 2'd2};
+    end else begin
+      s_div_q <= s_div_d;
+    end
+  end
+
+  always_comb begin
+    s_cnt_d = s_cnt_q + 1'b1;
+    if (s_div_q != div_i) begin
+      s_cnt_d = '0;
+    end else if (s_cnt_q == s_div_q / 2 - 1) begin
+      s_cnt_d = '0;
+    end
+  end
+
+  dffr #(DIV_VALUE_WIDTH) u_cnt_dffr (
+      clk_i,
+      rst_n_i,
+      s_cnt_d,
+      s_cnt_q
+  );
+
+  always_comb begin
+    s_clk_d = s_clk_q;
+    if (s_cnt_q == s_div_q / 2 - 1) begin
+      s_clk_d = ~s_clk_q;
+    end
+  end
+
+  dffr #(1) u_clk_dffr (
+      clk_i,
+      rst_n_i,
+      s_clk_d,
+      s_clk_q
+  );
+
+  assign clk_o = s_clk_q;
+endmodule
+
 module clk_int_even_div #(
     parameter int DIV_VALUE             = 2,
     parameter bit ENABLE_CLOCK_IN_RESET = 1'b0
