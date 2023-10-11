@@ -14,7 +14,13 @@ module clk_buf (
     output logic clk_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign clk_o = clk_i;
+`endif
+
+
 endmodule
 
 module clk_n (
@@ -22,7 +28,12 @@ module clk_n (
     output logic clk_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign clk_o = ~clk_i;
+`endif
+
 endmodule
 
 module clk_an2 (
@@ -31,7 +42,12 @@ module clk_an2 (
     output logic clk_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign clk_o = clk1_i & clk2_i;
+`endif
+
 endmodule
 
 
@@ -41,7 +57,12 @@ module clk_nd2 (
     output logic clk_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign clk_o = ~(clk1_i & clk2_i);
+`endif
+
 endmodule
 
 module clk_mux2 (
@@ -51,7 +72,12 @@ module clk_mux2 (
     output logic clk_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign clk_o = en_i ? clk2_i : clk1_i;
+`endif
+
 endmodule
 
 module clk_xor2 (
@@ -60,7 +86,12 @@ module clk_xor2 (
     output logic clk_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign clk_o = clk1_i ^ clk2_i;
+`endif
+
 endmodule
 
 module clk_icg (
@@ -70,6 +101,9 @@ module clk_icg (
     output logic clk_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   logic r_clk_en;
   always_latch begin
     if (clk_i == 1'b0) begin
@@ -78,6 +112,8 @@ module clk_icg (
   end
 
   assign clk_o = clk_i & r_clk_en;
+`endif
+
 endmodule
 
 module clk_icg2 (
@@ -87,6 +123,9 @@ module clk_icg2 (
     output logic clk_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   logic r_clk_en;
   always_latch begin
     if (clk_i == 1'b1) begin
@@ -95,4 +134,6 @@ module clk_icg2 (
   end
 
   assign clk_o = clk_i | (~r_clk_en);
+`endif
+
 endmodule
