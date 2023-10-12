@@ -9,7 +9,6 @@
 // See the Mulan PSL v2 for more details.
 
 // this file only include digital IO's behavioral model, for ASIC tape-out need to reimplement those models
-
 module tri_pd_pad (
     input  logic i_i,
     input  logic oen_i,
@@ -18,8 +17,13 @@ module tri_pd_pad (
     inout  wire  pad_io
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign pad_io = oen_i ? 1'bz : i_i;
   assign c_o    = pad_io;
+`endif
+
 endmodule
 
 module tri_pu_pad (
@@ -30,8 +34,13 @@ module tri_pu_pad (
     inout  wire  pad_io
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign pad_io = oen_i ? 1'bz : i_i;
   assign c_o    = pad_io;
+`endif
+
 endmodule
 
 module osc_pad (
@@ -43,6 +52,11 @@ module osc_pad (
     output logic xc_o
 );
 
+`ifdef BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
   assign xout_o = en_i ? xin_i : 1'b0;
   assign xc_o   = en_i ? xin_i : 1'b0;
+`endif
+
 endmodule
