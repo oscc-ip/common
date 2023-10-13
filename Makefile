@@ -19,12 +19,10 @@ endif
 # WARN_OPTIONS += -Wsensitivity-entire-vector -Wsensitivity-entire-array
 WARN_OPTIONS := -Wall -Winfloop -Wno-timescale
 SIM_OPTIONS  := -g2012 -s $(SIM_TOP) $(WARN_OPTIONS)
-INC_LIST     :=
-FILE_LIST    :=
+INC_LIST     := -I ../rtl
 SIMV_PROG    := simv
 
 FILE_LIST += -f ../filelist/$(SIM_FILE)_tb.f
-INC_LIST += -I ../rtl
 INC_LIST += -I ../tb
 
 comp:
