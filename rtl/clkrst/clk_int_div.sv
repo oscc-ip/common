@@ -140,13 +140,17 @@ module clk_int_even_div_simple #(
     input  logic [DIV_VALUE_WIDTH-1:0] div_i,
     input  logic                       div_valid_i,
     output logic                       div_ready_o,
+    output logic                       div_done_o,
     output logic                       clk_o
 );
 
   logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q, s_div_d, s_div_q;
-  logic s_clk_d, s_clk_q;
+  logic s_clk_d, s_clk_q, div_hdshk;
+  logic [1:0] s_div_done_d, s_div_done_q;
 
-  assign s_div_d = (s_div_q != div_i) ? div_i : s_div_q;
+  assign div_ready_o = 1'b1;
+  assign div_hdshk   = div_valid_i & div_ready_o;
+  assign s_div_d     = (div_hdshk && s_div_q != div_i) ? div_i : s_div_q;
   always_ff @(posedge clk_i, negedge rst_n_i) begin
     if (~rst_n_i) begin
       s_div_q <= {{(DIV_VALUE_WIDTH - 2) {1'b0}}, 2'd2};
@@ -157,7 +161,7 @@ module clk_int_even_div_simple #(
 
   always_comb begin
     s_cnt_d = s_cnt_q + 1'b1;
-    if (s_div_q != div_i) begin
+    if (div_hdshk && s_div_q != div_i) begin
       s_cnt_d = '0;
     end else if (s_cnt_q == s_div_q / 2 - 1) begin
       s_cnt_d = '0;
@@ -171,13 +175,24 @@ module clk_int_even_div_simple #(
       s_cnt_q
   );
 
+  assign div_done_o = s_div_done_q == 2'b11;
   always_comb begin
-    s_clk_d = s_clk_q;
-    if (s_cnt_q == s_div_q / 2 - 1) begin
-      s_clk_d = ~s_clk_q;
+    s_div_done_d = s_div_done_q;
+    if (div_hdshk && s_div_q != div_i) begin
+      s_div_done_d = '0;
+    end else if ((s_cnt_q == s_div_q / 2 - 1) && s_div_done_q < 2'b11) begin
+      s_div_done_d = s_div_done_q + 1'b1;
     end
   end
 
+  dffr #(2) u_ready_dffr (
+      clk_i,
+      rst_n_i,
+      s_div_done_d,
+      s_div_done_q
+  );
+
+  assign s_clk_d = (s_cnt_q == s_div_q / 2 - 1) ? ~s_clk_q : s_clk_q;
   dffr #(1) u_clk_dffr (
       clk_i,
       rst_n_i,
@@ -186,6 +201,13 @@ module clk_int_even_div_simple #(
   );
 
   assign clk_o = s_clk_q;
+  //   clk_icg u_clk_icg (
+  //       s_clk_q,
+  //       div_done_o,
+  //       1'b1,
+  //       clk_o
+  //   );
+
 endmodule
 
 module clk_int_even_div #(
@@ -197,7 +219,7 @@ module clk_int_even_div #(
     input  logic en_i,
     input  logic div_i,
     input  logic div_valid_i,
-    output logic div_ready_o,
+    output logic div_done_o,
     output logic clk_o
 );
 
