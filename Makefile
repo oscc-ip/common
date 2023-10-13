@@ -2,8 +2,11 @@ SIM_TOOL    ?= iverilog
 RUN_TOOL    ?= vvp
 WAVE_FORMAT ?=
 
-SIM_APP  ?= apb4_rtc
-SIM_TOP   := $(SIM_APP)_tb
+SIM_APP      ?= clk_int_even_div_simple
+SIM_PATH     ?= clkrst
+SIM_FILE     ?= clk_int_div
+SIM_TOP      := $(SIM_APP)_tb
+SIM_FILE_TOP := $(SIM_FILE)_tb
 TEST_ARGS ?= default_args
 
 ifeq ($(TEST_ARGS), dump_fst_wave)
@@ -20,12 +23,13 @@ INC_LIST     :=
 FILE_LIST    :=
 SIMV_PROG    := simv
 
-INC_LIST += -I ./rtl
-INC_LIST += -I ./tb
+FILE_LIST += -f ../filelist/$(SIM_FILE)_tb.f
+INC_LIST += -I ../rtl
+INC_LIST += -I ../tb
 
 comp:
 	@mkdir -p build
-	cd build && ($(SIM_TOOL) $(SIM_OPTIONS) $(FILE_LIST) $(INC_LIST) ../rtl/$(SIM_APP).sv ../tb/$(SIM_TOP).sv -o $(SIMV_PROG) || exit -1) 2>&1 | tee compile.log
+	cd build && ($(SIM_TOOL) $(SIM_OPTIONS) $(FILE_LIST) $(INC_LIST) ../rtl/$(SIM_PATH)/$(SIM_FILE).sv ../tb/$(SIM_FILE_TOP).sv -o $(SIMV_PROG) || exit -1) 2>&1 | tee compile.log
 
 run: comp
 	cd build && $(RUN_TOOL) -l run.log -n $(SIMV_PROG) +$(TEST_ARGS) $(WAVE_FORMAT)
