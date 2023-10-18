@@ -24,28 +24,26 @@
 // See the Mulan PSL v2 for more details.
 
 module cdc_2phase #(
-    parameter type T = logic
+    parameter int DATA_WIDTH = 32
 ) (
-    input  logic src_clk_i,
-    input  logic src_rst_n_i,
-    input  T     src_data_i,
-    input  logic src_valid_i,
-    output logic src_ready_o,
+    input  logic                  src_clk_i,
+    input  logic                  src_rst_n_i,
+    input  logic [DATA_WIDTH-1:0] src_data_i,
+    input  logic                  src_valid_i,
+    output logic                  src_ready_o,
 
-    input  logic dst_clk_i,
-    input  logic dst_rst_n_i,
-    output T     dst_data_o,
-    output logic dst_valid_o,
-    input  logic dst_ready_i
+    input  logic                  dst_clk_i,
+    input  logic                  dst_rst_n_i,
+    output logic [DATA_WIDTH-1:0] dst_data_o,
+    output logic                  dst_valid_o,
+    input  logic                  dst_ready_i
 );
 
-  logic s_async_req;
-  logic s_async_ack;
-  T     s_async_data;
+  logic                  s_async_req;
+  logic                  s_async_ack;
+  logic [DATA_WIDTH-1:0] s_async_data;
 
-  cdc_2phase_src #(
-      .T(T)
-  ) u_cdc_2phase_src (
+  cdc_2phase_src #(DATA_WIDTH) u_cdc_2phase_src (
       .rst_n_i     (src_rst_n_i),
       .clk_i       (src_clk_i),
       .data_i      (src_data_i),
@@ -56,9 +54,7 @@ module cdc_2phase #(
       .async_data_o(s_async_data)
   );
 
-  cdc_2phase_dst #(
-      .T(T)
-  ) u_cdc_2phase_dst (
+  cdc_2phase_dst #(DATA_WIDTH) u_cdc_2phase_dst (
       .rst_n_i     (dst_rst_n_i),
       .clk_i       (dst_clk_i),
       .data_o      (dst_data_o),
@@ -86,8 +82,8 @@ module cdc_2phase_src #(
 
   logic s_req_src_d, s_req_src_q;
   logic s_ack_src_d, s_ack_src_q;
-  logic s_ack_d, s_ack_q;
-  T s_data_src_d, s_data_src_q;
+  logic s_ack_q;
+  logic [DATA_WIDTH-1:0] s_data_src_d, s_data_src_q;
 
   // The req_src and data_src registers change when a new data item is accepted.
   assign s_req_src_d = (valid_i && ready_o) ? ~s_req_src_q : s_req_src_q;
@@ -104,6 +100,13 @@ module cdc_2phase_src #(
       rst_n_i,
       s_data_src_d,
       s_data_src_q
+  );
+
+  sync #(2, 1) u_ack_sync (
+      clk_i,
+      rst_n_i,
+      async_ack_i,
+      s_ack_q
   );
 
   assign ready_o      = (s_req_src_q == s_ack_q);
@@ -162,8 +165,8 @@ module cdc_2phase_dst #(
     end
   end
 
-  assign valid_o     = (ack_dst_q != r_req_q1);
-  assign data_o      = data_dst_q;
-  assign async_ack_o = ack_dst_q;
+  assign valid_o     = (s_ack_dst_q != r_req_q1);
+  assign data_o      = s_data_dst_q;
+  assign async_ack_o = s_ack_dst_q;
 
 endmodule
