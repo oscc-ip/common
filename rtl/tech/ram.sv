@@ -26,7 +26,7 @@ module tech_ram #(
 `ifdef BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  reg [BIT_WIDTH-1:0] r_intern_ram[0:WORD_DEPTH-1];
+  logic [BIT_WIDTH-1:0] r_intern_ram[0:WORD_DEPTH-1];
   always_ff @(posedge clk_i) begin
     if (~en_i && ~wen_i) begin
       r_intern_ram[addr_i] <= dat_i;
@@ -54,8 +54,8 @@ module tech_ram_bw #(
 `ifdef BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  reg  [BIT_WIDTH-1:0] r_intern_ram[0:WORD_DEPTH-1];
-  wire [BIT_WIDTH-1:0] s_dat_i;
+  logic [BIT_WIDTH-1:0] r_intern_ram[0:WORD_DEPTH-1];
+  logic [BIT_WIDTH-1:0] s_dat_i;
   for (genvar i = 0; i < BIT_WIDTH / 8; i++) begin
     assign s_dat_i[i*8+:8] = dat_i[i*8+:8] & {8{bw_i[i-1]}};
   end

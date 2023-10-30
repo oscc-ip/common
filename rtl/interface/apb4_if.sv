@@ -2,8 +2,8 @@ interface apb4_if #(
     parameter APB_ADDR_WIDTH = 32,
     parameter APB_DATA_WIDTH = 32
 ) (
-    input logic hclk,
-    input logic hresetn
+    input logic pclk,
+    input logic presetn
 );
 
   logic [  APB_ADDR_WIDTH-1:0] paddr;
