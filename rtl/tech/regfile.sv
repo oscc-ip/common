@@ -9,7 +9,7 @@
 // See the Mulan PSL v2 for more details.
 
 // this file only include behavioral model, for ASIC tape-out need to reimplement those models
-module tech_ram #(
+module tech_regfile #(
     parameter int BIT_WIDTH  = 128,
     parameter int WORD_DEPTH = 64
 ) (
@@ -36,7 +36,8 @@ module tech_ram #(
 `endif
 endmodule
 
-module tech_ram_bm #(
+
+module tech_regfile_bm #(
     parameter int BIT_WIDTH  = 128,
     parameter int WORD_DEPTH = 64
 ) (
