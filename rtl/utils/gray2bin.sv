@@ -18,5 +18,4 @@ module gray2bin #(
     for (genvar i = 0; i < DATA_WIDTH; i++) begin
       assign bin_o[i] = ^gray_i[DATA_WIDTH-1:i];
     end
-  endgenerate
 endmodule
