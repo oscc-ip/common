@@ -28,6 +28,8 @@ interface apb4_if #(
   logic                        pslverr;
 
   modport slave(
+      input pclk,
+      input presetn,
       input paddr,
       input pprot,
       input psel,
@@ -41,6 +43,8 @@ interface apb4_if #(
   );
 
   modport master(
+      input pclk,
+      input presetn,
       output paddr,
       output pprot,
       output psel,
