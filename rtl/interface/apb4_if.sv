@@ -8,6 +8,9 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`ifndef INC_APB4_IF_SV
+`define INC_APB4_IF_SV
+
 interface apb4_if #(
     parameter int APB_ADDR_WIDTH = 32,
     parameter int APB_DATA_WIDTH = 32
@@ -58,3 +61,5 @@ interface apb4_if #(
   );
 
 endinterface
+
+`endif

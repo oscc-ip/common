@@ -27,7 +27,7 @@ module apb4_master_model (
     Helper::print("apb4 master device init done");
   end
 
-  task automatic write(input bit [7:0] delay, input bit [31:0] addr, input bit [31:0] data);
+  task automatic write(input bit [31:0] addr, input bit [31:0] data);
     @(posedge apb4.pclk);
     apb4.paddr  = addr;
     apb4.psel   = 1'b1;
@@ -44,7 +44,7 @@ module apb4_master_model (
     apb4.pwdata  = 'x;
   endtask
 
-  task automatic read(input bit [7:0] delay, input bit [31:0] addr, output bit [31:0] data);
+  task automatic read(input bit [31:0] addr, output bit [31:0] data);
     @(posedge apb4.pclk);
     apb4.paddr  = addr;
     apb4.psel   = 1'b1;
@@ -62,8 +62,8 @@ module apb4_master_model (
     data         = apb4.prdata;
   endtask
 
-  task automatic cmp_data(input bit [7:0] delay, input bit [31:0] addr, input bit [31:0] ref_data);
-    read(delay, addr, rd_data);
+  task automatic cmp_data(input bit [31:0] addr, input bit [31:0] ref_data);
+    read(addr, rd_data);
     if (ref_data != rd_data) begin
       $display("%t [ERRO]: compare error-> receive: %h, expected: %h", $time, rd_data, ref_data);
     end
