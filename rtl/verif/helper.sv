@@ -1,3 +1,13 @@
+// Copyright (c) 2023 Beijing Institute of Open Source Chip
+// common is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//             http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+// EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+// MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
 `ifndef INC_HELPER_SV
 `define INC_HELPER_SV
 
@@ -47,8 +57,8 @@ class Helper;
   endfunction
 
   static function void test_summary();
-    $display("%t === [ALL TEST]: %0d [FAILED TEST]: %0d [PASS TEST]: %0d === ", $time, all_num,
-             failed_num, all_num - failed_num);
+    $display("=== [ALL TEST]: %0d [FAILED TEST]: %0d [PASS TEST]: %0d === ", all_num, failed_num,
+             all_num - failed_num);
   endfunction
 
   static task print(input string info);
@@ -58,7 +68,7 @@ class Helper;
   endtask
 
   static task check(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type);
-    if (log_lev > DEBUG) begin
+    if (log_lev > NORM) begin
       $display("%t [%s] checking [%s] type: %s actual: %h, expected: %h", $time, log_lev, name,
                cmp_type, actual, expected);
     end
