@@ -8,6 +8,8 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`include "helper.sv"
+
 module apb4_master_model (
     apb4_if.master apb4
 );
@@ -22,12 +24,10 @@ module apb4_master_model (
     apb4.penable = '0;
     apb4.pwrite  = '0;
     apb4.pwdata  = 'x;
-    #1 $display("%t [INFO]: apb4 master device init done", $time);
+    Helper::print("apb4 master device init done");
   end
 
   task automatic write(input bit [7:0] delay, input bit [31:0] addr, input bit [31:0] data);
-    // repeat (delay) @(apb4.pclk);
-    // #1;
     @(posedge apb4.pclk);
     apb4.paddr  = addr;
     apb4.psel   = 1'b1;
@@ -45,8 +45,6 @@ module apb4_master_model (
   endtask
 
   task automatic read(input bit [7:0] delay, input bit [31:0] addr, output bit [31:0] data);
-    // repeat (delay) @(apb4.pclk);
-    // #1;
     @(posedge apb4.pclk);
     apb4.paddr  = addr;
     apb4.psel   = 1'b1;

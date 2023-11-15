@@ -4,18 +4,19 @@
 class Helper;
   typedef enum {
     NORM  = 0,
-    DEBUG,
     INFO,
+    DEBUG,
     WARN,
     ERR
   } log_lev_t;
 
   typedef enum {
-    EQUAL,
-    GRET,
+    EQUL,
+    NEQU,
+    GREA,
     LESS,
     GREQ,
-    LEEQ
+    LESQ
   } cmp_t;
 
   static string    name       = "sv_helper";
@@ -56,16 +57,49 @@ class Helper;
     end
   endtask
 
-  static task check(input string name, input bit [31:0] actual, expected);
-    if (log_lev > NORM) begin
-      $display("%t [%s] checking %s actual: %h, expected: %h", $time, log_lev, name, actual,
-               expected);
+  static task check(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type);
+    if (log_lev > DEBUG) begin
+      $display("%t [%s] checking [%s] type: %s actual: %h, expected: %h", $time, log_lev, name,
+               cmp_type, actual, expected);
     end
 
     all_num++;
-    if (actual !== expected) begin
-      failed_num++;
+    if (cmp_type == EQUL) begin
+      if (actual != expected) begin
+        failed_num++;
+        err_msg(name, actual, expected, cmp_type);
+      end
+    end else if (cmp_type == NEQU) begin
+      if (actual == expected) begin
+        failed_num++;
+        err_msg(name, actual, expected, cmp_type);
+      end
+    end else if (cmp_type == GREA) begin
+      if (actual <= expected) begin
+        failed_num++;
+        err_msg(name, actual, expected, cmp_type);
+      end
+    end else if (cmp_type == LESS) begin
+      if (actual >= expected) begin
+        failed_num++;
+        err_msg(name, actual, expected, cmp_type);
+      end
+    end else if (cmp_type == GREQ) begin
+      if (actual < expected) begin
+        failed_num++;
+        err_msg(name, actual, expected, cmp_type);
+      end
+    end else if (cmp_type == LESQ) begin
+      if (actual > expected) begin
+        failed_num++;
+        err_msg(name, actual, expected, cmp_type);
+      end
     end
+  endtask
+
+  static task err_msg(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type);
+    $display("%t [ERROR] [%s] type: %s actual: %h, expected: %h", $time, name, cmp_type, actual,
+             expected);
   endtask
 endclass
 
