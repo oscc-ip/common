@@ -17,6 +17,7 @@
 class APB4Master extends TestBase;
   string                        name;
   logic                  [31:0] rd_data;
+  logic                  [31:0] wr_data;
   virtual apb4_if.master        apb4;
 
   extern function new(string name = "apb4_master", virtual apb4_if.master apb4);
@@ -24,6 +25,7 @@ class APB4Master extends TestBase;
   extern task write(input bit [31:0] addr, input bit [31:0] data);
   extern task read(input bit [31:0] addr);
   extern task test_reset_register();
+  extern task test_wr_rd_register();
   extern task test_irq();
 endclass
 
@@ -51,8 +53,8 @@ task APB4Master::write(input bit [31:0] addr, input bit [31:0] data);
   this.apb4.paddr  = addr;
   this.apb4.psel   = 1'b1;
   this.apb4.pwrite = 1'b1;
-  this.apb4.pstrb  = this.apb4.pwrite ? '1 : '0;  // refer to APB4 LRM
   this.apb4.pwdata = data;
+  this.apb4.pstrb  = '1;  // refer to APB4 LRM
 
   @(posedge this.apb4.pclk);
   this.apb4.penable = 1'b1;
@@ -62,17 +64,18 @@ task APB4Master::write(input bit [31:0] addr, input bit [31:0] data);
   this.apb4.penable = '0;
   this.apb4.pwrite  = '0;
   this.apb4.pwdata  = 'x;
+  this.apb4.pstrb   = '0;
 endtask
 
 task APB4Master::read(input bit [31:0] addr);
   logic [31:0] val;
   this.apb4.pprot = '0;
+  this.apb4.pstrb = '0;
   //   $display("=== [read oper] ===");
   @(posedge this.apb4.pclk);
   this.apb4.paddr  = addr;
   this.apb4.psel   = 1'b1;
   this.apb4.pwrite = 1'b0;
-  this.apb4.pstrb  = this.apb4.pwrite ? '1 : '0;
   this.apb4.pwdata = 'x;
 
   @(posedge this.apb4.pclk);
@@ -89,6 +92,10 @@ endtask
 
 task APB4Master::test_reset_register();
   $display("=== [test reset register] ===");
+endtask
+
+task APB4Master::test_wr_rd_register();
+  $display("=== [test wr and rd register] ===");
 endtask
 
 task APB4Master::test_irq();

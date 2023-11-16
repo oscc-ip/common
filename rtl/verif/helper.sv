@@ -30,7 +30,6 @@ class Helper;
   } cmp_t;
 
   static string    name       = "sv_helper";
-  static log_lev_t log_lev    = INFO;
   static int       all_num    = 0;
   static int       failed_num = 0;
 
@@ -61,13 +60,14 @@ class Helper;
              all_num - failed_num);
   endfunction
 
-  static task print(input string info);
+  static task print(input string info, input log_lev_t log_lev = INFO);
     if (log_lev > NORM) begin
       $display("%t [%s] %s", $time, log_lev, info);
     end
   endtask
 
-  static task check(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type);
+  static task check(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type,
+                    input log_lev_t log_lev = INFO);
     if (log_lev > NORM) begin
       $display("%t [%s] checking [%s] type: %s actual: %h, expected: %h", $time, log_lev, name,
                cmp_type, actual, expected);
