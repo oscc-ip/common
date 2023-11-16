@@ -13,22 +13,11 @@
 
 class TestBase;
   string name;
-
   extern function new(string name = "test_base");
-  extern task test_reset_register();
-  extern task test_irq();
 endclass
 
 function TestBase::new(string name);
   this.name = name;
 endfunction
-
-task TestBase::test_reset_register();
-  $display("=== [test reset register] ===");
-endtask
-
-task TestBase::test_irq();
-  $display("=== [test irq] ===");
-endtask
 
 `endif

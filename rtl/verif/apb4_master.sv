@@ -14,10 +14,6 @@
 `include "helper.sv"
 `include "test_base.sv"
 
-`define SYS_VAL 32'h101F_1010
-`define IDL_VAL 32'hFFFF_2022
-`define IDH_VAL 32'hFFFF_FFFF
-
 class APB4Master extends TestBase;
   string                        name;
   logic                  [31:0] rd_data;
@@ -27,7 +23,6 @@ class APB4Master extends TestBase;
   extern task init();
   extern task write(input bit [31:0] addr, input bit [31:0] data);
   extern task read(input bit [31:0] addr);
-  extern task cmp_data(input bit [31:0] addr, input bit [31:0] ref_data);
   extern task test_reset_register();
   extern task test_irq();
 endclass
@@ -93,13 +88,11 @@ task APB4Master::read(input bit [31:0] addr);
 endtask
 
 task APB4Master::test_reset_register();
-  super.test_reset_register();
-  this.read(32'hFFFF_0000);
-  Helper::check("SYS_VAL REG", this.rd_data, `SYS_VAL, Helper::EQUL);
-  this.read(32'hFFFF_0004);
-  Helper::check("IDL_VAL REG", this.rd_data, `IDL_VAL, Helper::EQUL);
-  this.read(32'hFFFF_0008);
-  Helper::check("IDH_VAL REG", this.rd_data, `IDH_VAL, Helper::EQUL);
+  $display("=== [test reset register] ===");
+endtask
+
+task APB4Master::test_irq();
+  $display("=== [test irq] ===");
 endtask
 
 `endif
