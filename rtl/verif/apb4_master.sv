@@ -24,6 +24,12 @@ class APB4Master extends TestBase;
   extern task init();
   extern task write(input bit [31:0] addr, input bit [31:0] data);
   extern task read(input bit [31:0] addr);
+  extern task wr_check(input bit [31:0] addr, string name, input bit [31:0] data,
+                       input Helper::cmp_t cmp_type,
+                       input Helper::log_lev_t log_level = Helper::NORM);
+  extern task rd_check(input bit [31:0] addr, string name, input bit [31:0] ref_data,
+                       input Helper::cmp_t cmp_type,
+                       input Helper::log_lev_t log_level = Helper::NORM);
   extern task test_reset_register();
   extern task test_wr_rd_register();
   extern task test_irq();
@@ -88,6 +94,23 @@ task APB4Master::read(input bit [31:0] addr);
   this.apb4.pwdata  = 'x;
   val               = this.apb4.prdata;
   this.rd_data      = val;
+endtask
+
+task APB4Master::wr_check(input bit [31:0] addr, string name, input bit [31:0] data,
+                          input Helper::cmp_t cmp_type,
+                          input Helper::log_lev_t log_level = Helper::NORM);
+  this.wr_data = data;
+  this.write(addr, this.wr_data);
+  this.read(addr);
+  Helper::check(name, this.rd_data, this.wr_data, cmp_type, log_level);
+
+endtask
+
+task APB4Master::rd_check(input bit [31:0] addr, string name, input bit [31:0] ref_data,
+                          input Helper::cmp_t cmp_type,
+                          input Helper::log_lev_t log_level = Helper::NORM);
+  this.read(addr);
+  Helper::check(name, this.rd_data, ref_data, cmp_type);
 endtask
 
 task APB4Master::test_reset_register();
