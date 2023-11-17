@@ -30,8 +30,8 @@ class APB4Master extends TestBase;
   extern task rd_check(input bit [31:0] addr, string name, input bit [31:0] ref_data,
                        input Helper::cmp_t cmp_type,
                        input Helper::log_lev_t log_level = Helper::NORM);
-  extern task test_reset_register();
-  extern task test_wr_rd_register();
+  extern task test_reset_reg();
+  extern task test_wr_rd_reg();
   extern task test_irq();
 endclass
 
@@ -113,12 +113,12 @@ task APB4Master::rd_check(input bit [31:0] addr, string name, input bit [31:0] r
   Helper::check(name, this.rd_data, ref_data, cmp_type, log_level);
 endtask
 
-task APB4Master::test_reset_register();
-  $display("=== [test reset register] ===");
+task APB4Master::test_reset_reg();
+  $display("=== [test reset reg] ===");
 endtask
 
-task APB4Master::test_wr_rd_register();
-  $display("=== [test wr and rd register] ===");
+task APB4Master::test_wr_rd_reg();
+  $display("=== [test wr and rd reg] ===");
 endtask
 
 task APB4Master::test_irq();

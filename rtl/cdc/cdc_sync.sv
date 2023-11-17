@@ -8,7 +8,12 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-module sync #(
+`ifndef INC_CDC_SYNC_SV
+`define INC_CDC_SYNC_SV
+
+`include "register.sv"
+
+module cdc_sync #(
     parameter int STAGE      = 2,
     parameter int DATA_WIDTH = 1
 ) (
@@ -39,3 +44,4 @@ module sync #(
 
   assign dat_o = s_sync_dat[STAGE-1];
 endmodule
+`endif

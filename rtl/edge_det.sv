@@ -8,30 +8,42 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`ifndef INC_EDGE_DET_SV
+`define INC_EDGE_DET_SV
+
+`include "register.sv"
+`include "cdc_sync.sv"
+
 // need to use high freq clk to oversample the dat edge with sync
-module edge_det (
-    input  logic clk_i,
-    input  logic rst_n_i,
-    input  logic dat_i,
-    output logic re_o,
-    output logic fe_o
+module edge_det #(
+    parameter int STAGE      = 2,
+    parameter int DATA_WIDTH = 1
+) (
+    input  logic                  clk_i,
+    input  logic                  rst_n_i,
+    input  logic [DATA_WIDTH-1:0] dat_i,
+    output logic [DATA_WIDTH-1:0] dat_o,
+    output logic [DATA_WIDTH-1:0] re_o,
+    output logic [DATA_WIDTH-1:0] fe_o
 );
 
-  logic s_dat_d, s_dat_q;
-  sync u_sync (
-      .clk_i,
-      .rst_n_i,
-      .dat_i,
-      .dat_o(s_dat_d)
+  logic [DATA_WIDTH-1:0] s_dat_d, s_dat_q;
+  assign dat_o = s_dat_q;
+  cdc_sync #(STAGE, DATA_WIDTH) u_cdc_sync (
+      .clk_i  (clk_i),
+      .rst_n_i(rst_n_i),
+      .dat_i  (dat_i),
+      .dat_o  (s_dat_d)
   );
 
-  dffr u_dffr (
-      .clk_i,
-      .rst_n_i,
-      .dat_i(s_dat_d),
-      .dat_o(s_dat_q)
+  dffr #(DATA_WIDTH) u_dffr (
+      .clk_i  (clk_i),
+      .rst_n_i(rst_n_i),
+      .dat_i  (s_dat_d),
+      .dat_o  (s_dat_q)
   );
 
   assign re_o = (~s_dat_q) & s_dat_d;
   assign fe_o = s_dat_q & (~s_dat_d);
 endmodule
+`endif
