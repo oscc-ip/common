@@ -110,7 +110,7 @@ task APB4Master::rd_check(input bit [31:0] addr, string name, input bit [31:0] r
                           input Helper::cmp_t cmp_type,
                           input Helper::log_lev_t log_level = Helper::NORM);
   this.read(addr);
-  Helper::check(name, this.rd_data, ref_data, cmp_type);
+  Helper::check(name, this.rd_data, ref_data, cmp_type, log_level);
 endtask
 
 task APB4Master::test_reset_register();

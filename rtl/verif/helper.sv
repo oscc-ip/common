@@ -69,7 +69,7 @@ class Helper;
   static task check(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type,
                     input log_lev_t log_lev = INFO);
     if (log_lev > NORM) begin
-      $display("%t [%s] checking [%s] type: %s actual: %h, expected: %h", $time, log_lev, name,
+      $display("%t [%s] checking [%15s] type: %s actual: %h, expected: %h", $time, log_lev, name,
                cmp_type, actual, expected);
     end
 
@@ -108,7 +108,7 @@ class Helper;
   endtask
 
   static task err_msg(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type);
-    $display("%t [ERROR] [%s] type: %s actual: %h, expected: %h", $time, name, cmp_type, actual,
+    $display("%t [ERROR] [%15s] type: %s actual: %h, expected: %h", $time, name, cmp_type, actual,
              expected);
   endtask
 endclass
