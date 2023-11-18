@@ -53,9 +53,9 @@ task APB4Master::init();
 endtask
 
 task APB4Master::write(input bit [31:0] addr, input bit [31:0] data);
-  //   $display("=== [write oper] ===");
   this.apb4.pprot = '0;
   @(posedge this.apb4.pclk);
+  #1;
   this.apb4.paddr  = addr;
   this.apb4.psel   = 1'b1;
   this.apb4.pwrite = 1'b1;
@@ -63,8 +63,10 @@ task APB4Master::write(input bit [31:0] addr, input bit [31:0] data);
   this.apb4.pstrb  = '1;  // refer to APB4 LRM
 
   @(posedge this.apb4.pclk);
+  #1;
   this.apb4.penable = 1'b1;
   @(posedge this.apb4.pclk && this.apb4.pready);
+  #1;
   this.apb4.paddr   = 'x;
   this.apb4.psel    = '0;
   this.apb4.penable = '0;
@@ -77,23 +79,27 @@ task APB4Master::read(input bit [31:0] addr);
   logic [31:0] val;
   this.apb4.pprot = '0;
   this.apb4.pstrb = '0;
-  //   $display("=== [read oper] ===");
   @(posedge this.apb4.pclk);
+  #1;
   this.apb4.paddr  = addr;
   this.apb4.psel   = 1'b1;
   this.apb4.pwrite = 1'b0;
   this.apb4.pwdata = 'x;
 
   @(posedge this.apb4.pclk);
+  #1;
   this.apb4.penable = 1'b1;
   @(posedge this.apb4.pclk && this.apb4.pready);
+  val          = this.apb4.prdata; // NOTE: read by posedge
+  this.rd_data = val;
+  #1;
   this.apb4.paddr   = 'x;
   this.apb4.psel    = '0;
   this.apb4.penable = '0;
   this.apb4.pwrite  = '0;
   this.apb4.pwdata  = 'x;
-  val               = this.apb4.prdata;
-  this.rd_data      = val;
+
+
 endtask
 
 task APB4Master::wr_check(input bit [31:0] addr, string name, input bit [31:0] data,

@@ -20,7 +20,7 @@ module dff #(
 );
 
   always_ff @(posedge clk_i) begin
-    dat_o <= dat_i;
+    dat_o <= #1 dat_i;
   end
 endmodule
 
@@ -37,7 +37,7 @@ module dffr #(
     if (~rst_n_i) begin
       dat_o <= '0;
     end else begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
@@ -55,7 +55,7 @@ module ndffr #(
     if (~rst_n_i) begin
       dat_o <= '0;
     end else begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
@@ -73,7 +73,7 @@ module dffrh #(
     if (~rst_n_i) begin
       dat_o <= '1;
     end else begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
@@ -92,7 +92,7 @@ module dffrc #(
     if (~rst_n_i) begin
       dat_o <= RESET_VAL;
     end else begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
@@ -110,7 +110,7 @@ module dffsr #(
     if (~rst_n_i) begin
       dat_o <= '0;
     end else begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
@@ -126,7 +126,7 @@ module dffl #(
 
   always_ff @(posedge clk_i) begin
     if (en_i) begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
@@ -145,7 +145,7 @@ module dfflr #(
     if (~rst_n_i) begin
       dat_o <= '0;
     end else if (en_i) begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
@@ -164,7 +164,7 @@ module dfflrh #(
     if (~rst_n_i) begin
       dat_o <= '1;
     end else if (en_i) begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
@@ -183,7 +183,7 @@ module dfflsr #(
     if (~rst_n_i) begin
       dat_o <= '0;
     end else if (en_i) begin
-      dat_o <= dat_i;
+      dat_o <= #1 dat_i;
     end
   end
 endmodule
