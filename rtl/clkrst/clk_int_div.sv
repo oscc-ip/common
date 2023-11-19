@@ -21,6 +21,9 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`ifndef INC_CLK_INT_DIV_SV
+`define INC_CLK_INT_DIV_SV
+
 module clk_int_even_div_static #(
     parameter int DIV_VALUE = 2
 ) (
@@ -28,9 +31,9 @@ module clk_int_even_div_static #(
     input  logic rst_n_i,
     output logic clk_o
 );
-  if (DIV_VALUE <= 0 || DIV_VALUE % 2) begin
-    $error("DIV_VALUE must be strictly larger than 0 and be even value");
-  end
+  // if (DIV_VALUE <= 0 || DIV_VALUE % 2) begin
+  //   $error("DIV_VALUE must be strictly larger than 0 and be even value");
+  // end
 
   localparam int DIV_VALUE_WIDTH = $clog2(DIV_VALUE) + 1;
   logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q;
@@ -75,9 +78,9 @@ module clk_int_odd_div_static #(
     input  logic rst_n_i,
     output logic clk_o
 );
-  if (DIV_VALUE < 2 || DIV_VALUE % 2 == 0) begin
-    $error("DIV_VALUE must be strictly larger than 0 and be odd value");
-  end
+  // if (DIV_VALUE < 2 || DIV_VALUE % 2 == 0) begin
+  //   $error("DIV_VALUE must be strictly larger than 0 and be odd value");
+  // end
 
   localparam int DIV_VALUE_WIDTH = $clog2(DIV_VALUE) + 1;
   logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q;
@@ -133,7 +136,8 @@ module clk_int_odd_div_static #(
 endmodule
 
 module clk_int_even_div_simple #(
-    parameter int DIV_VALUE_WIDTH = 32
+    parameter int DIV_VALUE_WIDTH  = 32,
+    parameter int DONE_DELAY_WIDTH = 3
 ) (
     input  logic                       clk_i,
     input  logic                       rst_n_i,
@@ -145,19 +149,21 @@ module clk_int_even_div_simple #(
 );
 
   logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q, s_div_d, s_div_q;
+  logic [DONE_DELAY_WIDTH-1:0] s_div_done_d, s_div_done_q;
   logic s_clk_d, s_clk_q, div_hdshk;
-  logic [1:0] s_div_done_d, s_div_done_q;
 
   assign div_ready_o = 1'b1;
   assign div_hdshk   = div_valid_i & div_ready_o;
   assign s_div_d     = (div_hdshk && s_div_q != div_i) ? div_i : s_div_q;
-  always_ff @(posedge clk_i, negedge rst_n_i) begin
-    if (~rst_n_i) begin
-      s_div_q <= {{(DIV_VALUE_WIDTH - 2) {1'b0}}, 2'd2};
-    end else begin
-      s_div_q <= s_div_d;
-    end
-  end
+
+  dffrc #(DIV_VALUE_WIDTH, {
+    {(DIV_VALUE_WIDTH - 2) {1'b0}}, 2'd2
+  }) u_div_dffrc (
+      clk_i,
+      rst_n_i,
+      s_div_d,
+      s_div_q
+  );
 
   always_comb begin
     s_cnt_d = s_cnt_q + 1'b1;
@@ -175,17 +181,17 @@ module clk_int_even_div_simple #(
       s_cnt_q
   );
 
-  assign div_done_o = s_div_done_q == 2'b11;
+  assign div_done_o = s_div_done_q == {DONE_DELAY_WIDTH{1'b1}};
   always_comb begin
     s_div_done_d = s_div_done_q;
     if (div_hdshk && s_div_q != div_i) begin
       s_div_done_d = '0;
-    end else if ((s_cnt_q == s_div_q / 2 - 1) && s_div_done_q < 2'b11) begin
+    end else if ((s_cnt_q == s_div_q / 2 - 1) && s_div_done_q < {DONE_DELAY_WIDTH{1'b1}}) begin
       s_div_done_d = s_div_done_q + 1'b1;
     end
   end
 
-  dffr #(2) u_ready_dffr (
+  dffr #(DONE_DELAY_WIDTH) u_ready_dffr (
       clk_i,
       rst_n_i,
       s_div_done_d,
@@ -201,12 +207,6 @@ module clk_int_even_div_simple #(
   );
 
   assign clk_o = s_clk_q;
-  //   clk_icg u_clk_icg (
-  //       s_clk_q,
-  //       div_done_o,
-  //       1'b1,
-  //       clk_o
-  //   );
 
 endmodule
 
@@ -223,5 +223,5 @@ module clk_int_even_div #(
     output logic clk_o
 );
 
-
 endmodule
+`endif
