@@ -135,6 +135,7 @@ module clk_int_odd_div_static #(
   );
 endmodule
 
+// NOTE: need to make sure the div_i is driven by reg and lager than 1
 module clk_int_even_div_simple #(
     parameter int DIV_VALUE_WIDTH  = 32,
     parameter int DONE_DELAY_WIDTH = 3
@@ -148,28 +149,18 @@ module clk_int_even_div_simple #(
     output logic                       clk_o
 );
 
-  logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q, s_div_d, s_div_q;
+  logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q;
   logic [DONE_DELAY_WIDTH-1:0] s_div_done_d, s_div_done_q;
   logic s_clk_d, s_clk_q, div_hdshk;
 
   assign div_ready_o = 1'b1;
   assign div_hdshk   = div_valid_i & div_ready_o;
-  assign s_div_d     = (div_hdshk && s_div_q != div_i) ? div_i : s_div_q;
-
-  dffrc #(DIV_VALUE_WIDTH, {
-    {(DIV_VALUE_WIDTH - 2) {1'b0}}, 2'd2
-  }) u_div_dffrc (
-      clk_i,
-      rst_n_i,
-      s_div_d,
-      s_div_q
-  );
 
   always_comb begin
     s_cnt_d = s_cnt_q + 1'b1;
-    if (div_hdshk && s_div_q != div_i) begin
+    if (div_hdshk) begin
       s_cnt_d = '0;
-    end else if (s_cnt_q == s_div_q / 2 - 1) begin
+    end else if (s_cnt_q == div_i / 2 - 1) begin
       s_cnt_d = '0;
     end
   end
@@ -184,9 +175,9 @@ module clk_int_even_div_simple #(
   assign div_done_o = s_div_done_q == {DONE_DELAY_WIDTH{1'b1}};
   always_comb begin
     s_div_done_d = s_div_done_q;
-    if (div_hdshk && s_div_q != div_i) begin
+    if (div_hdshk) begin
       s_div_done_d = '0;
-    end else if ((s_cnt_q == s_div_q / 2 - 1) && s_div_done_q < {DONE_DELAY_WIDTH{1'b1}}) begin
+    end else if ((s_cnt_q == div_i / 2 - 1) && s_div_done_q < {DONE_DELAY_WIDTH{1'b1}}) begin
       s_div_done_d = s_div_done_q + 1'b1;
     end
   end
@@ -198,7 +189,7 @@ module clk_int_even_div_simple #(
       s_div_done_q
   );
 
-  assign s_clk_d = (s_cnt_q == s_div_q / 2 - 1) ? ~s_clk_q : s_clk_q;
+  assign s_clk_d = (s_cnt_q == div_i / 2 - 1) ? ~s_clk_q : s_clk_q;
   dffr #(1) u_clk_dffr (
       clk_i,
       rst_n_i,

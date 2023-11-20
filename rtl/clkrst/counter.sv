@@ -20,6 +20,11 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`ifndef INC_COUNTER_SV
+`define INC_COUNTER_SV
+
+`include "register.sv"
+
 module counter #(
     parameter int DATA_WIDTH = 4
 ) (
@@ -31,7 +36,7 @@ module counter #(
     input  logic                  down_i,
     input  logic [DATA_WIDTH-1:0] dat_i,
     output logic [DATA_WIDTH-1:0] dat_o,
-    output logic                  ov_o
+    output logic                  ovf_o
 );
 
   delta_counter #(DATA_WIDTH) u_delta_counter (
@@ -44,7 +49,7 @@ module counter #(
       .delta_i({{(DATA_WIDTH - 1) {1'b0}}, 1'b1}),
       .dat_i,
       .dat_o,
-      .ov_o
+      .ovf_o
   );
 endmodule
 
@@ -64,10 +69,9 @@ module delta_counter #(
 );
 
   logic [DATA_WIDTH:0] s_cnt_d, s_cnt_q;
-  logic s_ov_d, s_ov_q;
 
   assign dat_o = s_cnt_q[DATA_WIDTH-1:0];
-  assign ovf_o = s_ov_q;
+  assign ovf_o = s_cnt_q[DATA_WIDTH];
 
   always_comb begin
     s_cnt_d = s_cnt_q;
@@ -91,24 +95,5 @@ module delta_counter #(
       .dat_o(s_cnt_q)
   );
 
-  always_comb begin
-    s_ov_d = s_ov_q;
-    if (clr_i || load_i) begin
-      s_ov_d = 1'b0;
-    end else if ((~s_ov_q) && en_i) begin
-      if (down_i) begin
-        s_ov_d = delta_i > s_cnt_q[DATA_WIDTH-1:0];
-      end else begin
-        s_ov_d = s_cnt_q[DATA_WIDTH-1:0] > ({DATA_WIDTH{1'b1}} - delta_i);
-      end
-    end
-  end
-
-  dffr #(1) u_ov_dffr (
-      .clk_i,
-      .rst_n_i,
-      .dat_i(s_ov_d),
-      .dat_o(s_ov_q)
-  );
-
 endmodule
+`endif
