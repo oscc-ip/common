@@ -23,6 +23,12 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`ifndef INC_CDC_TWOPHASE_SV
+`define INC_CDC_TWOPHASE_SV
+
+`include "register.sv"
+`include "cdc_sync.sv"
+
 module cdc_2phase #(
     parameter int DATA_WIDTH = 32
 ) (
@@ -44,8 +50,8 @@ module cdc_2phase #(
   logic [DATA_WIDTH-1:0] s_async_data;
 
   cdc_2phase_src #(DATA_WIDTH) u_cdc_2phase_src (
-      .rst_n_i     (src_rst_n_i),
       .clk_i       (src_clk_i),
+      .rst_n_i     (src_rst_n_i),
       .data_i      (src_data_i),
       .valid_i     (src_valid_i),
       .ready_o     (src_ready_o),
@@ -55,8 +61,8 @@ module cdc_2phase #(
   );
 
   cdc_2phase_dst #(DATA_WIDTH) u_cdc_2phase_dst (
-      .rst_n_i     (dst_rst_n_i),
       .clk_i       (dst_clk_i),
+      .rst_n_i     (dst_rst_n_i),
       .data_o      (dst_data_o),
       .valid_o     (dst_valid_o),
       .ready_i     (dst_ready_i),
@@ -102,7 +108,7 @@ module cdc_2phase_src #(
       s_data_src_q
   );
 
-  sync #(2, 1) u_ack_sync (
+  cdc_sync #(2, 1) u_ack_sync (
       clk_i,
       rst_n_i,
       async_ack_i,
@@ -155,9 +161,9 @@ module cdc_2phase_dst #(
   // The req_dst and req registers act as synchronization stages.
   always_ff @(posedge clk_i or negedge rst_n_i) begin
     if (!rst_n_i) begin
-      r_req_dst_q <= 0;
-      r_req_q0    <= 0;
-      r_req_q1    <= 0;
+      r_req_dst_q <= '0;
+      r_req_q0    <= '0;
+      r_req_q1    <= '0;
     end else begin
       r_req_dst_q <= async_req_i;
       r_req_q0    <= r_req_dst_q;
@@ -170,3 +176,4 @@ module cdc_2phase_dst #(
   assign async_ack_o = s_ack_dst_q;
 
 endmodule
+`endif
