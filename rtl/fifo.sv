@@ -33,13 +33,14 @@ module fifo #(
   logic [LOG_BUFFER_DEPTH - 1:0] s_rd_ptr_d, s_rd_ptr_q, s_wr_ptr_d, s_wr_ptr_q;
   logic [LOG_BUFFER_DEPTH:0] s_cnt_d, s_cnt_q;
   logic [BUFFER_DEPTH - 1:0][DATA_WIDTH-1:0] s_mem_d, s_mem_q;
-  logic push_hdshk = push_i & ~full_o;
-  logic pop_hdshk = pop_i & ~empty_o;
+  logic push_hdshk, pop_hdshk;
 
-  assign cnt_o   = s_cnt_q;
-  assign empty_o = s_cnt_q == 0;
-  assign full_o  = s_cnt_q == BUFFER_DEPTH;
-  assign dat_o   = s_mem_q[s_rd_ptr_q];
+  assign push_hdshk = push_i & ~full_o;
+  assign pop_hdshk  = pop_i & ~empty_o;
+  assign cnt_o      = s_cnt_q;
+  assign empty_o    = s_cnt_q == 0;
+  assign full_o     = s_cnt_q == BUFFER_DEPTH;
+  assign dat_o      = s_mem_q[s_rd_ptr_q];
 
   always_comb begin
     s_rd_ptr_d = s_rd_ptr_q;
@@ -71,6 +72,7 @@ module fifo #(
       s_wr_ptr_q
   );
 
+  // push, pop in the meantime, s_cnt_d will not change
   always_comb begin
     s_cnt_d = s_cnt_q;
     if (flush_i) begin
