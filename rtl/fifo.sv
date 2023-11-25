@@ -8,6 +8,11 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`ifndef INC_FIFO_SV
+`define INC_FIFO_SV
+
+`include "register.sv"
+
 module fifo #(
     parameter int DATA_WIDTH       = 32,
     parameter int BUFFER_DEPTH     = 8,
@@ -98,3 +103,4 @@ module fifo #(
   );
 
 endmodule
+`endif

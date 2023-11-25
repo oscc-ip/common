@@ -40,7 +40,7 @@ module lfsr_galois #(
   end
 
   assign dat_o = s_shift_q;
-  dffr #(DATA_WIDTH) u_shift_dffrc (
+  dffr #(DATA_WIDTH) u_shift_dffr (
       clk_i,
       rst_n_i,
       s_shift_d,
