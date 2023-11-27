@@ -18,16 +18,16 @@ module fifo #(
     parameter int BUFFER_DEPTH     = 8,
     parameter int LOG_BUFFER_DEPTH = (BUFFER_DEPTH > 1) ? $clog2(BUFFER_DEPTH) : 1
 ) (
-    input  logic                        clk_i,
-    input  logic                        rst_n_i,
-    input  logic                        flush_i,
-    output logic                        full_o,
-    output logic                        empty_o,
-    output logic [LOG_BUFFER_DEPTH-1:0] cnt_o,
-    input  logic [      DATA_WIDTH-1:0] dat_i,
-    input  logic                        push_i,
-    output logic [      DATA_WIDTH-1:0] dat_o,
-    input  logic                        pop_i
+    input  logic                      clk_i,
+    input  logic                      rst_n_i,
+    input  logic                      flush_i,
+    output logic                      full_o,
+    output logic                      empty_o,
+    output logic [LOG_BUFFER_DEPTH:0] cnt_o,
+    input  logic [    DATA_WIDTH-1:0] dat_i,
+    input  logic                      push_i,
+    output logic [    DATA_WIDTH-1:0] dat_o,
+    input  logic                      pop_i
 );
 
   logic [LOG_BUFFER_DEPTH - 1:0] s_rd_ptr_d, s_rd_ptr_q, s_wr_ptr_d, s_wr_ptr_q;
@@ -77,9 +77,9 @@ module fifo #(
     s_cnt_d = s_cnt_q;
     if (flush_i) begin
       s_cnt_d = '0;
-    end else if (push_hdshk) begin
+    end else if (push_hdshk && ~pop_hdshk) begin
       s_cnt_d = s_cnt_q + 1'b1;
-    end else if (pop_hdshk) begin
+    end else if (~push_hdshk && pop_hdshk) begin
       s_cnt_d = s_cnt_q - 1'b1;
     end
   end
