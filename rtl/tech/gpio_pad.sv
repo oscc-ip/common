@@ -8,6 +8,9 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`ifndef INC_GPIO_PAD_SV
+`define INC_GPIO_PAD_SV
+
 // this file only include digital IO's behavioral model, for ASIC tape-out need to reimplement those models
 module tri_pd_pad_h (
     input  logic i_i,
@@ -94,3 +97,5 @@ module osc_pad (
 `endif
 
 endmodule
+
+`endif
