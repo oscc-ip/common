@@ -8,6 +8,9 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
+`ifndef INC_TECH_RAM_SV
+`define INC_TECH_RAM_SV
+
 // this file only include behavioral model, for ASIC tape-out need to reimplement those models
 module tech_ram #(
     parameter int BIT_WIDTH  = 128,
@@ -53,8 +56,8 @@ module tech_ram_bm #(
 `ifdef BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  logic [BIT_WIDTH-1:0] r_intern_ram[0:WORD_DEPTH-1];
-  logic [BIT_WIDTH-1:0] s_dat_i;
+  logic [WORD_DEPTH-1:0][BIT_WIDTH-1:0] r_intern_ram;
+  logic [ BIT_WIDTH-1:0]                s_dat_i;
   for (genvar i = 0; i < BIT_WIDTH / 8; i++) begin
     assign s_dat_i[i*8+:8] = dat_i[i*8+:8] & {8{bm_i[i-1]}};
   end
@@ -68,3 +71,5 @@ module tech_ram_bm #(
   end
 `endif
 endmodule
+
+`endif
