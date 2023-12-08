@@ -169,6 +169,26 @@ module dfflrh #(
   end
 endmodule
 
+module dfflrc #(
+    parameter int                    DATA_WIDTH = 1,
+    parameter logic [DATA_WIDTH-1:0] RESET_VAL  = '0
+) (
+    input  logic                  clk_i,
+    input  logic                  rst_n_i,
+    input  logic                  en_i,
+    input  logic [DATA_WIDTH-1:0] dat_i,
+    output logic [DATA_WIDTH-1:0] dat_o
+);
+
+  always_ff @(posedge clk_i, negedge rst_n_i) begin
+    if (~rst_n_i) begin
+      dat_o <= RESET_VAL;
+    end else if (en_i) begin
+      dat_o <= #1 dat_i;
+    end
+  end
+endmodule
+
 module dfflsr #(
     parameter int DATA_WIDTH = 1
 ) (
