@@ -17,21 +17,21 @@
 
 class AXI4Master extends TestBase;
   string                        name;
-  logic                  [31:0] rd_data;
-  logic                  [31:0] wr_data;
+  logic                  [63:0] rd_data;
+  logic                  [63:0] wr_data;
   virtual axi4_if.master        axi4;
 
-  extern function new(string name = "apb4_master", virtual axi4_if.master axi4);
+  extern function new(string name = "axi4_master", virtual axi4_if.master axi4);
   extern task automatic init();
-  extern task automatic write(input bit [31:0] addr, input bit [31:0] data);
+  extern task automatic write(input bit [31:0] addr, input bit [63:0] data);
   extern task automatic read(input bit [31:0] addr);
-  extern task automatic wr_rd_check(input bit [31:0] addr, string name, input bit [31:0] data,
+  extern task automatic wr_rd_check(input bit [31:0] addr, string name, input bit [63:0] data,
                                     input Helper::cmp_t cmp_type,
                                     input Helper::log_lev_t log_level = Helper::NORM);
-  extern task automatic wr_check(input bit [31:0] addr, string name, input bit [31:0] data,
-                                 input bit [31:0] ref_data, input Helper::cmp_t cmp_type,
+  extern task automatic wr_check(input bit [31:0] addr, string name, input bit [63:0] data,
+                                 input bit [63:0] ref_data, input Helper::cmp_t cmp_type,
                                  input Helper::log_lev_t log_level = Helper::NORM);
-  extern task automatic rd_check(input bit [31:0] addr, string name, input bit [31:0] ref_data,
+  extern task automatic rd_check(input bit [31:0] addr, string name, input bit [63:0] ref_data,
                                  input Helper::cmp_t cmp_type,
                                  input Helper::log_lev_t log_level = Helper::NORM);
 endclass
@@ -134,7 +134,7 @@ task automatic AXI4Master::read(input bit [31:0] addr);
 
 endtask
 
-task automatic AXI4Master::wr_rd_check(input bit [31:0] addr, string name, input bit [31:0] data,
+task automatic AXI4Master::wr_rd_check(input bit [31:0] addr, string name, input bit [63:0] data,
                                        input Helper::cmp_t cmp_type,
                                        input Helper::log_lev_t log_level = Helper::NORM);
   this.wr_data = data;
@@ -144,15 +144,15 @@ task automatic AXI4Master::wr_rd_check(input bit [31:0] addr, string name, input
 
 endtask
 
-task automatic AXI4Master::wr_check(input bit [31:0] addr, string name, input bit [31:0] data,
-                                    input bit [31:0] ref_data, input Helper::cmp_t cmp_type,
+task automatic AXI4Master::wr_check(input bit [31:0] addr, string name, input bit [63:0] data,
+                                    input bit [63:0] ref_data, input Helper::cmp_t cmp_type,
                                     input Helper::log_lev_t log_level = Helper::NORM);
   this.wr_data = data;
   this.write(addr, this.wr_data);
   Helper::check(name, this.wr_data, ref_data, cmp_type, log_level);
 endtask
 
-task automatic AXI4Master::rd_check(input bit [31:0] addr, string name, input bit [31:0] ref_data,
+task automatic AXI4Master::rd_check(input bit [31:0] addr, string name, input bit [63:0] ref_data,
                                     input Helper::cmp_t cmp_type,
                                     input Helper::log_lev_t log_level = Helper::NORM);
   this.read(addr);
