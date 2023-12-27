@@ -122,7 +122,7 @@ task automatic AXI4Master::read(input bit [31:0] addr);
   #1;
   this.axi4.penable = 1'b1;
   @(posedge this.axi4.pclk && this.axi4.pready);
-  val          = this.axi4.prdata;  // NOTE: read by posedge
+  val          = this.axi4.prdata;
   this.rd_data = val;
   #1;
   this.axi4.paddr   = 'x;
