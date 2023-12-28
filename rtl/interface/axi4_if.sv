@@ -8,66 +8,69 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-interface axi4_if #(
-    parameter int AXI_ADDR_WIDTH = 32,
-    parameter int AXI_DATA_WIDTH = 64,
-    parameter int AXI_ID_WIDTH   = 4,
-    parameter int AXI_USER_WIDTH = 4
-) (
+`ifndef INC_APB4_IF_SV
+`define INC_APB4_IF_SV
+
+`include "axi4_define.sv"
+
+interface axi4_if (
     input logic aclk,
     input logic aresetn
 );
-  logic [          AXI_ID_WIDTH-1:0] awid;
-  logic [        AXI_ADDR_WIDTH-1:0] awaddr;
-  logic [                       7:0] awlen;
-  logic [                       2:0] awsize;
-  logic [                       1:0] awburst;
-  logic                              awlock;
-  logic [                       3:0] awcache;
-  logic [                       2:0] awprot;
-  logic [                       3:0] awqos;
-  logic [                       3:0] awregion;
-  logic [        AXI_USER_WIDTH-1:0] awuser;
-  logic                              awvalid;
-  logic                              awready;
+  logic [          `AXI4_ID_WIDTH-1:0] awid;
+  logic [        `AXI4_ADDR_WIDTH-1:0] awaddr;
+  logic [                         7:0] awlen;
+  logic [                         2:0] awsize;
+  logic [                         1:0] awburst;
+  logic                                awlock;
+  logic [                         3:0] awcache;
+  logic [                         2:0] awprot;
+  logic [                         3:0] awqos;
+  logic [                         3:0] awregion;
+  logic [        `AXI4_USER_WIDTH-1:0] awuser;
+  logic                                awvalid;
+  logic                                awready;
 
-  logic [          AXI_ID_WIDTH-1:0] wid;
-  logic [        AXI_DATA_WIDTH-1:0] wdata;
-  logic [$clog2(AXI_DATA_WIDTH)-1:0] wstrb;
-  logic                              wlast;
-  logic [        AXI_USER_WIDTH-1:0] wuser;
-  logic                              wvalid;
-  logic                              wready;
+  logic [          `AXI4_ID_WIDTH-1:0] wid;
+  logic [        `AXI4_DATA_WIDTH-1:0] wdata;
+  logic [$clog2(`AXI4_DATA_WIDTH)-1:0] wstrb;
+  logic                                wlast;
+  logic [        `AXI4_USER_WIDTH-1:0] wuser;
+  logic                                wvalid;
+  logic                                wready;
 
-  logic [          AXI_ID_WIDTH-1:0] bid;
-  logic [                       1:0] bresp;
-  logic [        AXI_USER_WIDTH-1:0] buser;
-  logic                              bvalid;
-  logic                              bready;
+  logic [          `AXI4_ID_WIDTH-1:0] bid;
+  logic [                         1:0] bresp;
+  logic [        `AXI4_USER_WIDTH-1:0] buser;
+  logic                                bvalid;
+  logic                                bready;
 
-  logic [          AXI_ID_WIDTH-1:0] arid;
-  logic [        AXI_ADDR_WIDTH-1:0] araddr;
-  logic [                       7:0] arlen;
-  logic [                       2:0] arsize;
-  logic [                       1:0] arburst;
-  logic                              arlock;
-  logic [                       3:0] arcache;
-  logic [                       2:0] arprot;
-  logic [                       3:0] arqos;
-  logic [                       3:0] arregion;
-  logic [        AXI_USER_WIDTH-1:0] aruser;
-  logic                              arvalid;
-  logic                              arready;
+  logic [          `AXI4_ID_WIDTH-1:0] arid;
+  logic [        `AXI4_ADDR_WIDTH-1:0] araddr;
+  logic [                         7:0] arlen;
+  logic [                         2:0] arsize;
+  logic [                         1:0] arburst;
+  logic                                arlock;
+  logic [                         3:0] arcache;
+  logic [                         2:0] arprot;
+  logic [                         3:0] arqos;
+  logic [                         3:0] arregion;
+  logic [        `AXI4_USER_WIDTH-1:0] aruser;
+  logic                                arvalid;
+  logic                                arready;
 
-  logic [          AXI_ID_WIDTH-1:0] rid;
-  logic [        AXI_DATA_WIDTH-1:0] rdata;
-  logic [                       1:0] rresp;
-  logic                              rlast;
-  logic [        AXI_USER_WIDTH-1:0] ruser;
-  logic                              rvalid;
-  logic                              rready;
+  logic [          `AXI4_ID_WIDTH-1:0] rid;
+  logic [        `AXI4_DATA_WIDTH-1:0] rdata;
+  logic [                         1:0] rresp;
+  logic                                rlast;
+  logic [        `AXI4_USER_WIDTH-1:0] ruser;
+  logic                                rvalid;
+  logic                                rready;
 
   modport slave(
+      input aclk,
+      input aresetn,
+
       input awid,
       input awaddr,
       input awlen,
@@ -120,6 +123,9 @@ interface axi4_if #(
   );
 
   modport master(
+      input aclk,
+      input aresetn,
+
       output awid,
       output awaddr,
       output awlen,
@@ -172,3 +178,5 @@ interface axi4_if #(
   );
 
 endinterface
+
+`endif
