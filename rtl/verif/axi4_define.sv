@@ -12,9 +12,9 @@
 `define INC_AXI4_DEF_SV
 
 // verilog_format: off
-`define AXI4_BURST_SIZE_BYTE     3'b000
-`define AXI4_BURST_SIZE_HALF     3'b001
-`define AXI4_BURST_SIZE_WORD     3'b010
+`define AXI4_BURST_SIZE_1BYPE    3'b000
+`define AXI4_BURST_SIZE_2BYTES   3'b001
+`define AXI4_BURST_SIZE_4BYTES   3'b010
 `define AXI4_BURST_SIZE_8BYTES   3'b011
 `define AXI4_BURST_SIZE_16BYTES  3'b100
 `define AXI4_BURST_SIZE_32BYTES  3'b101
@@ -38,6 +38,9 @@
 `define AXI4_PROT_DATA           3'b000
 `define AXI4_PROT_INSTRUCTION    3'b100
 
+`define AXI4_QOS_NORMAL          4'b0000
+
+`define AXI4_REGIN_NORMAL        4'b0000
 
 `define AXI4_RESP_OKAY           2'b00
 `define AXI4_RESP_EXOKAY         2'b01
