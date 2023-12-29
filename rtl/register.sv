@@ -131,7 +131,7 @@ module dffl #(
   end
 endmodule
 
-module dfflr #(
+module dffer #(
     parameter int DATA_WIDTH = 1
 ) (
     input  logic                  clk_i,
@@ -150,7 +150,7 @@ module dfflr #(
   end
 endmodule
 
-module dfflrh #(
+module dfferh #(
     parameter int DATA_WIDTH = 1
 ) (
     input  logic                  clk_i,
@@ -169,7 +169,7 @@ module dfflrh #(
   end
 endmodule
 
-module dfflrc #(
+module dfferc #(
     parameter int                    DATA_WIDTH = 1,
     parameter logic [DATA_WIDTH-1:0] RESET_VAL  = '0
 ) (
@@ -189,7 +189,7 @@ module dfflrc #(
   end
 endmodule
 
-module dfflsr #(
+module dffesr #(
     parameter int DATA_WIDTH = 1
 ) (
     input  logic                  clk_i,
