@@ -50,6 +50,7 @@ module lfsr_galois #(
 endmodule
 
 // due to the delay, more recommand to use galois type lfsr
+// NOTE: this module is no ready for use, need more test
 module lfsr_fibonacci #(
     parameter int DATA_WIDTH = 32,
     parameter int SEED       = 0
