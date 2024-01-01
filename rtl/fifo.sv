@@ -13,6 +13,7 @@
 
 `include "register.sv"
 
+//NOTE: buffer depth need to be 2^x val
 module fifo #(
     parameter int DATA_WIDTH       = 32,
     parameter int BUFFER_DEPTH     = 8,
