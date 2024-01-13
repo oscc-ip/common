@@ -19,9 +19,9 @@
 `define SHIFT_REG_TYPE_LOOP  2'b10
 `define SHIFT_REG_TYPE_SERI  2'b11
 
-`define SHIFT_REG_DIR_KEEP   2'b00
-`define SHIFT_REG_DIR_LEFT   2'b01
-`define SHIFT_REG_DIR_RIGHT  2'b10
+`define SHIFT_REG_DIR_LEFT   2'b00
+`define SHIFT_REG_DIR_RIGHT  2'b01
+`define SHIFT_REG_DIR_KEEP   2'b10
 // verilog_format: on
 
 // NOTE: assure DATA_WIDTH >= 2
@@ -32,11 +32,11 @@ module shift_reg #(
     input  logic                  rst_n_i,
     input  logic [           1:0] type_i,
     input  logic [           1:0] dir_i,
-    input  logic [           1:0] ld_en_i,
+    input  logic                  ld_en_i,
     input  logic                  sft_en_i,
     input  logic                  ser_dat_i,
     input  logic [DATA_WIDTH-1:0] par_data_i,
-    output logci                  ser_dat_o,
+    output logic                  ser_dat_o,
     output logic [DATA_WIDTH-1:0] par_data_o
 );
 
@@ -53,7 +53,6 @@ module shift_reg #(
     end else begin
       s_sf_d = s_sf_q;
       unique case (dir_i)
-        `SHIFT_REG_DIR_KEEP: s_sf_d = s_sf_q;
         `SHIFT_REG_DIR_LEFT: begin
           s_sf_d[DATA_WIDTH-1:1] = s_sf_q[DATA_WIDTH-2:0];
           unique case (type_i)
@@ -74,6 +73,7 @@ module shift_reg #(
             default: s_sf_d[DATA_WIDTH-1] = 1'b0;
           endcase
         end
+        `SHIFT_REG_DIR_KEEP: s_sf_d = s_sf_q;
         default: s_sf_d = s_sf_q;
       endcase
     end
