@@ -75,6 +75,26 @@ module edge_det_re #(
   assign re_o = (~s_dat_q) & s_dat_d;
 endmodule
 
+module edge_det_sync_re #(
+    parameter int DATA_WIDTH = 1
+) (
+    input  logic                  clk_i,
+    input  logic                  rst_n_i,
+    input  logic [DATA_WIDTH-1:0] dat_i,
+    output logic [DATA_WIDTH-1:0] re_o
+);
+
+  logic [DATA_WIDTH-1:0] s_dat_d, s_dat_q;
+  assign s_dat_d = dat_i;
+  dffr #(DATA_WIDTH) u_dffr (
+      .clk_i  (clk_i),
+      .rst_n_i(rst_n_i),
+      .dat_i  (s_dat_d),
+      .dat_o  (s_dat_q)
+  );
+
+  assign re_o = (~s_dat_q) & s_dat_d;
+endmodule
 
 module edge_det_fe #(
     parameter int STAGE      = 2,
