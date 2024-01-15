@@ -13,7 +13,9 @@
 
 // verilog_format: off
 `define AXI4_ADDR_WIDTH          32
+`define AXI4_ADDR_OFT_WIDTH      12 // no cross 4KB
 `define AXI4_DATA_WIDTH          64
+`define AXI4_WSTRB_WIDTH         (`AXI4_DATA_WIDTH / 8)
 `define AXI4_USER_WIDTH          4
 `define AXI4_ID_WIDTH            4
 

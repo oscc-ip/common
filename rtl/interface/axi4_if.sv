@@ -31,7 +31,6 @@ interface axi4_if (
   logic                                awvalid;
   logic                                awready;
 
-  logic [          `AXI4_ID_WIDTH-1:0] wid;
   logic [        `AXI4_DATA_WIDTH-1:0] wdata;
   logic [$clog2(`AXI4_DATA_WIDTH)-1:0] wstrb;
   logic                                wlast;
@@ -85,7 +84,6 @@ interface axi4_if (
       input awvalid,
       output awready,
 
-      input wid,
       input wdata,
       input wstrb,
       input wlast,
@@ -140,7 +138,6 @@ interface axi4_if (
       output awvalid,
       input awready,
 
-      output wid,
       output wdata,
       output wstrb,
       output wlast,
