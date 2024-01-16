@@ -26,7 +26,7 @@ class AXI4Master extends TestBase;
   extern task automatic write(
       input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
       input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
-      input bit [$clog2(`AXI4_DATA_WIDTH)-1:0] strb);
+      input bit [`AXI4_DATA_WIDTH/8-1:0] strb);
 
   // extern task automatic read(input bit [31:0] addr);
   // extern task automatic wr_rd_check(input bit [31:0] addr, string name, input bit [63:0] data,
@@ -59,7 +59,6 @@ task automatic AXI4Master::init();
   this.axi4.awregion = `AXI4_REGION_NORMAL;
   this.axi4.awvalid  = '0;
 
-  this.axi4.wid      = '0;
   this.axi4.wdata    = 'x;
   this.axi4.wstrb    = '0;
   this.axi4.wlast    = '0;
@@ -88,11 +87,8 @@ endtask
 task automatic AXI4Master::write(
     input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
     input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
-    input bit [$clog2(`AXI4_DATA_WIDTH)-1:0] strb);
+    input bit [`AXI4_DATA_WIDTH/8-1:0] strb);
 
-  // if(1'b1) begin
-  //   $error("hello I am maksyuki!!!");
-  // end
   // aw channel
   @(posedge this.axi4.aclk);
   #1;
@@ -103,8 +99,13 @@ task automatic AXI4Master::write(
   this.axi4.awburst = burst;
   this.axi4.awvalid = 1'b1;
 
-  @(posedge this.axi4.aclk && this.axi4.awready);
+  @(posedge this.axi4.aclk);
+  while (~this.axi4.awready) begin
+    @(posedge this.axi4.aclk);
+  end
   #1;
+  $display("%t aw trigger", $time);
+
   this.axi4.awid    = '0;
   this.axi4.awaddr  = 'x;
   this.axi4.awlen   = '0;
@@ -112,25 +113,24 @@ task automatic AXI4Master::write(
   this.axi4.awburst = `AXI4_BURST_TYPE_FIXED;
   this.axi4.awvalid = '0;
 
-  // // w burst channel
-  // for (int i = 0; i < len + 1; i++) begin
-  //   this.axi4.wid    = id;
-  //   this.axi4.wdata  = data.pop_front();
-  //   this.axi4.wstrb  = strb;
-  //   this.axi4.wlast  = i == len;
-  //   this.axi4.wvalid = 1'b1;
+  // w burst channel
+  for (int i = 0; i < len + 1'b1; i++) begin
+    this.axi4.wdata  = data.pop_front();
+    this.axi4.wstrb  = strb;
+    this.axi4.wlast  = i == len;
+    this.axi4.wvalid = 1'b1;
+    @(posedge this.axi4.aclk);
+    while (~this.axi4.wready) begin
+      @(posedge this.axi4.aclk);
+    end
+    #1;
+    $display("%t w burst trigger", $time);
+  end
 
-  //   @(posedge this.axi4.aclk && this.axi4.wready);
-  //   #1;
-  // end
-
-  // this.axi4.wid    = '0;
-  // this.axi4.wdata  = 'x;
-  // this.axi4.wstrb  = '0;
-  // this.axi4.wlast  = '0;
-  // this.axi4.wvalid = '0;
-
-
+  this.axi4.wdata  = 'x;
+  this.axi4.wstrb  = '0;
+  this.axi4.wlast  = '0;
+  this.axi4.wvalid = '0;
 endtask
 
 // task automatic AXI4Master::read(input bit [31:0] addr);
