@@ -28,9 +28,9 @@ module tech_regfile #(
   logic [BIT_WIDTH-1:0] r_intern_ram[0:WORD_DEPTH-1];
   always_ff @(posedge clk_i) begin
     if (~en_i && ~wen_i) begin
-      r_intern_ram[addr_i] <= dat_i;
+      r_intern_ram[addr_i] <= #1 dat_i;
     end else begin
-      dat_o <= (~en_i && wen_i) ? r_intern_ram[addr_i] : {(BIT_WIDTH / 32) {$random}};
+      dat_o <= #1 (~en_i && wen_i) ? r_intern_ram[addr_i] : {(BIT_WIDTH / 32) {$random}};
     end
   end
 `endif
@@ -67,9 +67,9 @@ module tech_regfile_bm #(
 
   always_ff @(posedge clk_i) begin
     if (s_en && s_wen) begin
-      r_intern_ram[addr_i] <= (dat_i & s_bm) | (r_intern_ram[addr_i] & ~s_bm);
+      r_intern_ram[addr_i] <= #1 (dat_i & s_bm) | (r_intern_ram[addr_i] & ~s_bm);
     end
-    dat_o <= (s_en && ~s_wen) ? r_intern_ram[addr_i] : {(BIT_WIDTH / 32) {$random}};
+    dat_o <= #1 (s_en && ~s_wen) ? r_intern_ram[addr_i] : {(BIT_WIDTH / 32) {$random}};
   end
 `endif
 endmodule
