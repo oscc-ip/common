@@ -26,7 +26,8 @@
 
 // NOTE: assure DATA_WIDTH >= 2
 module shift_reg #(
-    parameter int DATA_WIDTH = 8
+    parameter int DATA_WIDTH = 8,
+    parameter int SHIFT_NUM  = 1
 ) (
     input  logic                  clk_i,
     input  logic                  rst_n_i,
@@ -34,16 +35,16 @@ module shift_reg #(
     input  logic [           1:0] dir_i,
     input  logic                  ld_en_i,
     input  logic                  sft_en_i,
-    input  logic                  ser_dat_i,
+    input  logic [ SHIFT_NUM-1:0] ser_dat_i,
     input  logic [DATA_WIDTH-1:0] par_data_i,
-    output logic                  ser_dat_o,
+    output logic [ SHIFT_NUM-1:0] ser_dat_o,
     output logic [DATA_WIDTH-1:0] par_data_o
 );
 
   logic [DATA_WIDTH-1:0] s_sf_d, s_sf_q;
   logic s_sf_en;
 
-  assign ser_dat_o = dir_i == `SHIFT_REG_DIR_RIGHT ? s_sf_q[0] : s_sf_q[DATA_WIDTH-1];
+  assign ser_dat_o  = dir_i == `SHIFT_REG_DIR_RIGHT ? s_sf_q[SHIFT_NUM-1:0] : s_sf_q[DATA_WIDTH-1-:SHIFT_NUM];
   assign par_data_o = s_sf_q;
 
   assign s_sf_en = ld_en_i || (dir_i != `SHIFT_REG_DIR_KEEP && sft_en_i);
@@ -54,27 +55,29 @@ module shift_reg #(
       s_sf_d = s_sf_q;
       unique case (dir_i)
         `SHIFT_REG_DIR_LEFT: begin
-          s_sf_d[DATA_WIDTH-1:1] = s_sf_q[DATA_WIDTH-2:0];
+          s_sf_d[DATA_WIDTH-1:SHIFT_NUM] = s_sf_q[DATA_WIDTH-SHIFT_NUM-1:0];
           unique case (type_i)
-            `SHIFT_REG_TYPE_ARICH: s_sf_d[0] = 1'b0;
-            `SHIFT_REG_TYPE_LOGIC: s_sf_d[0] = 1'b0;
-            `SHIFT_REG_TYPE_LOOP: s_sf_d[0] = s_sf_q[DATA_WIDTH-1];
-            `SHIFT_REG_TYPE_SERI: s_sf_d[0] = ser_dat_i;
-            default: s_sf_d[0] = 1'b0;
+            `SHIFT_REG_TYPE_ARICH: s_sf_d[SHIFT_NUM-1:0] = '0;
+            `SHIFT_REG_TYPE_LOGIC: s_sf_d[SHIFT_NUM-1:0] = '0;
+            `SHIFT_REG_TYPE_LOOP:  s_sf_d[SHIFT_NUM-1:0] = s_sf_q[DATA_WIDTH-1-:SHIFT_NUM];
+            `SHIFT_REG_TYPE_SERI:  s_sf_d[SHIFT_NUM-1:0] = ser_dat_i;
+            default:               s_sf_d[SHIFT_NUM-1:0] = '0;
           endcase
         end
         `SHIFT_REG_DIR_RIGHT: begin
-          s_sf_d[DATA_WIDTH-2:0] = s_sf_q[DATA_WIDTH-1:1];
+          s_sf_d[DATA_WIDTH-SHIFT_NUM-1:0] = s_sf_q[DATA_WIDTH-1:SHIFT_NUM];
           unique case (type_i)
-            `SHIFT_REG_TYPE_ARICH: s_sf_d[DATA_WIDTH-1] = s_sf_q[DATA_WIDTH-1] == 1'b1;
-            `SHIFT_REG_TYPE_LOGIC: s_sf_d[DATA_WIDTH-1] = 1'b0;
-            `SHIFT_REG_TYPE_LOOP: s_sf_d[DATA_WIDTH-1] = s_sf_q[0];
-            `SHIFT_REG_TYPE_SERI: s_sf_d[DATA_WIDTH-1] = ser_dat_i;
-            default: s_sf_d[DATA_WIDTH-1] = 1'b0;
+            // verilog_format: off
+            `SHIFT_REG_TYPE_ARICH: s_sf_d[DATA_WIDTH-1-:SHIFT_NUM] = {SHIFT_NUM{s_sf_q[DATA_WIDTH-1]}};
+            `SHIFT_REG_TYPE_LOGIC: s_sf_d[DATA_WIDTH-1-:SHIFT_NUM] = '0;
+            `SHIFT_REG_TYPE_LOOP: s_sf_d[DATA_WIDTH-1-:SHIFT_NUM] = s_sf_q[SHIFT_NUM-1:0];
+            `SHIFT_REG_TYPE_SERI: s_sf_d[DATA_WIDTH-1-:SHIFT_NUM] = ser_dat_i;
+            default: s_sf_d[DATA_WIDTH-1-:SHIFT_NUM] = '0;
+            // verilog_format: on
           endcase
         end
         `SHIFT_REG_DIR_KEEP: s_sf_d = s_sf_q;
-        default: s_sf_d = s_sf_q;
+        default:             s_sf_d = s_sf_q;
       endcase
     end
   end
