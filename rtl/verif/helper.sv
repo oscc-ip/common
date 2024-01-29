@@ -29,9 +29,10 @@ class Helper;
     LESQ
   } cmp_t;
 
-  static string    name       = "sv_helper";
-  static int       all_num    = 0;
-  static int       failed_num = 0;
+  localparam DATA_WIDTH = 64;
+  static string name       = "sv_helper";
+  static int    all_num    = 0;
+  static int    failed_num = 0;
 
   static function void start_banner();
     $display("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
@@ -66,8 +67,8 @@ class Helper;
     end
   endtask
 
-  static task check(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type,
-                    input log_lev_t log_lev = INFO);
+  static task check(input string name, input bit [DATA_WIDTH-1:0] actual, expected,
+                    input cmp_t cmp_type, input log_lev_t log_lev = INFO);
     if (log_lev > NORM) begin
       $display("%t [%s] checking [%15s] type: %s actual: %h, expected: %h", $time, log_lev, name,
                cmp_type, actual, expected);
@@ -107,7 +108,16 @@ class Helper;
     end
   endtask
 
-  static task err_msg(input string name, input bit [31:0] actual, expected, input cmp_t cmp_type);
+  // NOTE: actual hardware encode
+  static task check_queue(input string name, input bit [DATA_WIDTH-1:0] actual[$], expected[$],
+                          input cmp_t cmp_type, input log_lev_t log_lev = INFO);
+    foreach (actual[i]) begin
+      check(name, actual[i], expected[i], cmp_type, log_lev);
+    end
+  endtask
+
+  static task err_msg(input string name, input bit [DATA_WIDTH-1:0] actual, expected,
+                      input cmp_t cmp_type);
     $display("%t [ERROR] [%15s] type: %s actual: %h, expected: %h", $time, name, cmp_type, actual,
              expected);
   endtask

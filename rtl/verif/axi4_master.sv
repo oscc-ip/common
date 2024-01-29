@@ -34,12 +34,16 @@ class AXI4Master extends TestBase;
   // extern task automatic wr_rd_check(input bit [31:0] addr, string name, input bit [63:0] data,
   //                                   input Helper::cmp_t cmp_type,
   //                                   input Helper::log_lev_t log_level = Helper::NORM);
-  // extern task automatic wr_check(input bit [31:0] addr, string name, input bit [63:0] data,
-  //                                input bit [63:0] ref_data, input Helper::cmp_t cmp_type,
-  //                                input Helper::log_lev_t log_level = Helper::NORM);
-  // extern task automatic rd_check(input bit [31:0] addr, string name, input bit [63:0] ref_data,
-  //                                input Helper::cmp_t cmp_type,
-  //                                input Helper::log_lev_t log_level = Helper::NORM);
+  extern task automatic wr_check(
+      input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
+      input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
+      input bit [`AXI4_DATA_WIDTH/8-1:0] strb, input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$],
+      input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
+
+  extern task automatic rd_check(
+      input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
+      input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$],
+      input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
 endclass
 
 function AXI4Master::new(string name, virtual axi4_if.master axi4);
@@ -108,7 +112,7 @@ task automatic AXI4Master::write(
     @(posedge this.axi4.aclk);
   end
   #1;
-  // $display("%t aw trigger", $time);
+  $display("%t aw trigger", $time);
 
   this.axi4.awid    = '0;
   this.axi4.awaddr  = 'x;
@@ -128,7 +132,7 @@ task automatic AXI4Master::write(
       @(posedge this.axi4.aclk);
     end
     #1;
-    // $display("%t w burst trigger", $time);
+    $display("%t w burst trigger", $time);
   end
 
   this.axi4.wdata  = 'x;
@@ -152,7 +156,6 @@ endtask
 task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
                                 input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
                                 input bit [2:0] size, input bit [1:0] burst);
-
   this.rd_data = {};
   // ar channel
   @(posedge this.axi4.aclk);
@@ -185,7 +188,7 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
       @(posedge this.axi4.aclk);
     end
     this.rd_data.push_back(this.axi4.rdata);
-    $display("%t: this.axi4.rdata: %h", $time, this.axi4.rdata);
+    // $display("%t: this.axi4.rdata: %h", $time, this.axi4.rdata);
     #1;
   end
 
@@ -202,19 +205,24 @@ endtask
 
 // endtask
 
-// task automatic AXI4Master::wr_check(input bit [31:0] addr, string name, input bit [63:0] data,
-//                                     input bit [63:0] ref_data, input Helper::cmp_t cmp_type,
-//                                     input Helper::log_lev_t log_level = Helper::NORM);
-//   this.wr_data = data;
-//   this.write(addr, this.wr_data);
-//   Helper::check(name, this.wr_data, ref_data, cmp_type, log_level);
-// endtask
+task automatic AXI4Master::wr_check(
+    input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
+    input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
+    input bit [`AXI4_DATA_WIDTH/8-1:0] strb, input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$],
+    input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
 
-// task automatic AXI4Master::rd_check(input bit [31:0] addr, string name, input bit [63:0] ref_data,
-//                                     input Helper::cmp_t cmp_type,
-//                                     input Helper::log_lev_t log_level = Helper::NORM);
-//   this.read(addr);
-//   Helper::check(name, this.rd_data, ref_data, cmp_type, log_level);
-// endtask
+  this.wr_data = data;
+  this.write(id, addr, len, size, burst, this.wr_data, strb);
+  Helper::check_queue(name, this.wr_data, ref_data, cmp_type, log_level);
+endtask
+
+task automatic AXI4Master::rd_check(
+    input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
+    input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$],
+    input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
+
+  this.read(id, addr, len, size, burst);
+  Helper::check_queue(name, this.rd_data, ref_data, cmp_type, log_level);
+endtask
 
 `endif
