@@ -22,6 +22,10 @@ class AXI4Master extends TestBase;
   virtual axi4_if.master                        axi4;
 
   extern function new(string name = "axi4_master", virtual axi4_if.master axi4);
+  extern function automatic bit [`AXI4_WSTRB_WIDTH-1:0] calc_strb(
+      input bit [`AXI4_WSTRB_WIDTH-1:0] addr, input bit [2:0] size);
+  extern function automatic bit [`AXI4_ADDR_WIDTH-1:0] calc_addr(
+      input bit [`AXI4_WSTRB_WIDTH-1:0] addr, input bit [2:0] size, input bit [1:0] burst);
   extern task automatic init();
   extern task automatic write(
       input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
@@ -92,6 +96,49 @@ task automatic AXI4Master::init();
   Helper::print("axi4 master device init done");
 endtask
 
+function automatic bit [`AXI4_WSTRB_WIDTH-1:0] AXI4Master::calc_strb(
+    input bit [`AXI4_WSTRB_WIDTH-1:0] addr, input bit [2:0] size);
+
+  bit [`AXI4_WSTRB_WIDTH-1:0] align_strb = '0;
+  int                         ofset = addr % (1 << size);
+  unique case (size)
+    `AXI4_BURST_SIZE_1BYTE:  align_strb = {1{1'b1}};
+    `AXI4_BURST_SIZE_2BYTES: align_strb = {2{1'b1}};
+    `AXI4_BURST_SIZE_4BYTES: align_strb = {4{1'b1}};
+    `AXI4_BURST_SIZE_8BYTES: align_strb = {8{1'b1}};
+    default:                 align_strb = '0;
+  endcase
+
+  return align_strb << ofset;
+endfunction
+
+function automatic bit [`AXI4_ADDR_WIDTH-1:0] AXI4Master::calc_addr(
+    input bit [`AXI4_WSTRB_WIDTH-1:0] addr, input bit [2:0] size, input bit [1:0] burst);
+
+  int ofset;
+  unique case (burst)
+    `AXI4_BURST_TYPE_FIXED: return addr;
+    `AXI4_BURST_TYPE_INCR: begin
+      ofset = addr % `AXI4_WSTRB_WIDTH;
+      if ((ofset + (1 << size)) <= `AXI4_WSTRB_WIDTH) begin
+        return addr + (1 << size);
+      end else begin
+        return addr + `AXI4_WSTRB_WIDTH - (1 << size);  // TODO: right?
+      end
+    end
+    `AXI4_BURST_TYPE_WRAP: begin
+      $display("no support now");
+      return addr;
+    end
+    `AXI4_BURST_TYPE_RESV: begin
+      $display("error burst type");
+      return addr;
+    end
+  endcase
+
+endfunction
+
+
 task automatic AXI4Master::write(
     input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
     input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
@@ -102,7 +149,7 @@ task automatic AXI4Master::write(
   #1;
   this.axi4.awid    = id;
   this.axi4.awaddr  = addr;
-  this.axi4.awlen   = len + 1'b1;
+  this.axi4.awlen   = len - 1;
   this.axi4.awsize  = size;
   this.axi4.awburst = burst;
   this.axi4.awvalid = 1'b1;
@@ -112,34 +159,36 @@ task automatic AXI4Master::write(
     @(posedge this.axi4.aclk);
   end
   #1;
-  $display("%t aw trigger", $time);
-
+  // $display("%t aw trigger", $time);
   this.axi4.awid    = '0;
   this.axi4.awaddr  = 'x;
   this.axi4.awlen   = '0;
   this.axi4.awsize  = `AXI4_BURST_SIZE_1BYTE;
   this.axi4.awburst = `AXI4_BURST_TYPE_FIXED;
   this.axi4.awvalid = '0;
+  @(negedge this.axi4.aclk);
 
   // w burst channel
-  for (int i = 0; i < len + 1'b1; i++) begin
+  for (int i = 0; i < len; i++) begin
     this.axi4.wdata  = data.pop_front();
     this.axi4.wstrb  = strb;
-    this.axi4.wlast  = i == len;
+    this.axi4.wlast  = i == len - 1;
     this.axi4.wvalid = 1'b1;
     @(posedge this.axi4.aclk);
     while (~this.axi4.wready) begin
       @(posedge this.axi4.aclk);
     end
     #1;
-    $display("%t w burst trigger", $time);
+    // $display("%t w burst trigger", $time);
   end
 
   this.axi4.wdata  = 'x;
   this.axi4.wstrb  = '0;
   this.axi4.wlast  = '0;
   this.axi4.wvalid = '0;
+  @(negedge this.axi4.aclk);
 
+  // b channel
   this.axi4.bready = 1'b1;
   @(posedge this.axi4.aclk);
   while (~this.axi4.bvalid) begin
@@ -148,21 +197,33 @@ task automatic AXI4Master::write(
 
   if (this.axi4.bid != id) begin
     $error("%t [wr mismatch id] awid is %d, bid: %d", $time, id, this.axi4.bid);
+  end else begin
+    unique case (this.axi4.bresp)
+      `AXI4_RESP_OKAY: begin
+      end
+      `AXI4_RESP_EXOKAY:       $display("%t EXOKAY", $time);
+      `AXI4_RESP_SLAVE_ERROR:  $display("%t SLVERR", $time);
+      `AXI4_RESP_DECODE_ERROR: $display("%t DECERR", $time);
+    endcase
   end
   #1;
   this.axi4.bready = 1'b0;
+  @(negedge this.axi4.aclk);
 endtask
 
 task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
                                 input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
                                 input bit [2:0] size, input bit [1:0] burst);
+  bit [ `AXI4_ADDR_WIDTH-1:0] tmp_addr;
+  bit [`AXI4_WSTRB_WIDTH-1:0] tmp_strb;
+  bit [ `AXI4_DATA_WIDTH-1:0] tmp_mask;
   this.rd_data = {};
   // ar channel
   @(posedge this.axi4.aclk);
   #1;
   this.axi4.arid    = id;
   this.axi4.araddr  = addr;
-  this.axi4.arlen   = len + 1'b1;
+  this.axi4.arlen   = len - 1;
   this.axi4.arsize  = size;
   this.axi4.arburst = burst;
   this.axi4.arvalid = 1'b1;
@@ -172,27 +233,46 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
     @(posedge this.axi4.aclk);
   end
   #1;
-
+  // $display("%t ar trigger", $time);
   this.axi4.arid    = '0;
   this.axi4.araddr  = 'x;
   this.axi4.arlen   = '0;
   this.axi4.arsize  = `AXI4_BURST_SIZE_1BYTE;
   this.axi4.arburst = `AXI4_BURST_TYPE_FIXED;
   this.axi4.arvalid = '0;
+  @(negedge this.axi4.aclk);
 
   // r burst channel
-  this.axi4.rready  = 1'b1;
-  for (int i = 0; i < len + 1'b1; i++) begin
+  tmp_addr = addr;
+  @(posedge this.axi4.aclk);
+  #1;
+  this.axi4.rready = 1'b1;
+  for (int i = 0; i < len; i++) begin
     @(posedge this.axi4.aclk);
     while (~this.axi4.rvalid) begin
       @(posedge this.axi4.aclk);
     end
-    this.rd_data.push_back(this.axi4.rdata);
+    tmp_strb = this.calc_strb(tmp_addr, size);
+    for (int j = 0; j < `AXI4_WSTRB_WIDTH; j++) begin
+      tmp_mask[j*8+:8] = {8{tmp_strb[j]}};
+    end
     // $display("%t: this.axi4.rdata: %h", $time, this.axi4.rdata);
+    this.rd_data.push_back(this.axi4.rdata & tmp_mask);
+    if (this.axi4.rid != id) begin
+      $error("%t [rd mismatch id] arid is %d, rid: %d", $time, id, this.axi4.rid);
+    end
+
+    if (i == len - 1 && ~axi4.rlast) begin
+      $error("%t [rd error last]", $time, id);
+    end else begin
+      @(negedge this.axi4.aclk);
+      tmp_addr = this.calc_addr(tmp_addr, size, burst);
+    end
     #1;
   end
 
   this.axi4.rready = 1'b0;
+  @(negedge this.axi4.aclk);
 endtask
 
 // task automatic AXI4Master::wr_rd_check(input bit [31:0] addr, string name, input bit [63:0] data,
