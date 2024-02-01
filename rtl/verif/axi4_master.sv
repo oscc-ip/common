@@ -29,8 +29,7 @@ class AXI4Master extends TestBase;
   extern task automatic init();
   extern task automatic write(
       input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
-      input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
-      input bit [`AXI4_DATA_WIDTH/8-1:0] strb);
+      input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$]);
 
   extern task automatic read(input bit [`AXI4_ID_WIDTH-1:0] id,
                              input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
@@ -41,8 +40,8 @@ class AXI4Master extends TestBase;
   extern task automatic wr_check(
       input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
       input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
-      input bit [`AXI4_DATA_WIDTH/8-1:0] strb, input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$],
-      input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
+      input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$], input Helper::cmp_t cmp_type,
+      input Helper::log_lev_t log_level = Helper::NORM);
 
   extern task automatic rd_check(
       input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
@@ -100,7 +99,7 @@ function automatic bit [`AXI4_WSTRB_WIDTH-1:0] AXI4Master::calc_strb(
     input bit [`AXI4_WSTRB_WIDTH-1:0] addr, input bit [2:0] size);
 
   bit [`AXI4_WSTRB_WIDTH-1:0] align_strb = '0;
-  int                         ofset = addr % (1 << size);
+  int                         ofset = addr % `AXI4_WSTRB_WIDTH;
   unique case (size)
     `AXI4_BURST_SIZE_1BYTE:  align_strb = {1{1'b1}};
     `AXI4_BURST_SIZE_2BYTES: align_strb = {2{1'b1}};
@@ -141,8 +140,10 @@ endfunction
 
 task automatic AXI4Master::write(
     input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
-    input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
-    input bit [`AXI4_DATA_WIDTH/8-1:0] strb);
+    input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$]);
+
+  bit [ `AXI4_ADDR_WIDTH-1:0] tmp_addr;
+  bit [`AXI4_WSTRB_WIDTH-1:0] tmp_strb;
 
   // aw channel
   @(posedge this.axi4.aclk);
@@ -167,11 +168,13 @@ task automatic AXI4Master::write(
   this.axi4.awburst = `AXI4_BURST_TYPE_FIXED;
   this.axi4.awvalid = '0;
   @(negedge this.axi4.aclk);
-
+  #1;
   // w burst channel
+  tmp_addr = addr;
   for (int i = 0; i < len; i++) begin
     this.axi4.wdata  = data.pop_front();
-    this.axi4.wstrb  = strb;
+    this.axi4.wstrb  = this.calc_strb(tmp_addr, size);
+    tmp_addr         = this.calc_addr(tmp_addr, size, burst);
     this.axi4.wlast  = i == len - 1;
     this.axi4.wvalid = 1'b1;
     @(posedge this.axi4.aclk);
@@ -288,11 +291,11 @@ endtask
 task automatic AXI4Master::wr_check(
     input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
     input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] data[$],
-    input bit [`AXI4_DATA_WIDTH/8-1:0] strb, input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$],
-    input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
+    input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$], input Helper::cmp_t cmp_type,
+    input Helper::log_lev_t log_level = Helper::NORM);
 
   this.wr_data = data;
-  this.write(id, addr, len, size, burst, this.wr_data, strb);
+  this.write(id, addr, len, size, burst, this.wr_data);
   Helper::check_queue(name, this.wr_data, ref_data, cmp_type, log_level);
 endtask
 
@@ -300,9 +303,22 @@ task automatic AXI4Master::rd_check(
     input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
     input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$],
     input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
-
+  bit [`AXI4_DATA_WIDTH-1:0] filter_ref_data[$] = {};
+  foreach (ref_data[i]) begin
+    unique case (size)
+      `AXI4_BURST_SIZE_1BYTE:  filter_ref_data[i] = ref_data[i][7:0];
+      `AXI4_BURST_SIZE_2BYTES: filter_ref_data[i] = ref_data[i][15:0];
+      `AXI4_BURST_SIZE_4BYTES: filter_ref_data[i] = ref_data[i][31:0];
+      `AXI4_BURST_SIZE_8BYTES: filter_ref_data[i] = ref_data[i][63:0];
+      default: begin
+        filter_ref_data[i] = ref_data[i];
+        $display("no support now");
+      end
+    endcase
+  end
   this.read(id, addr, len, size, burst);
-  Helper::check_queue(name, this.rd_data, ref_data, cmp_type, log_level);
+
+  Helper::check_queue(name, this.rd_data, filter_ref_data, cmp_type, log_level);
 endtask
 
 `endif
