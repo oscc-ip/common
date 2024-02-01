@@ -303,21 +303,56 @@ task automatic AXI4Master::rd_check(
     input bit [`AXI4_ID_WIDTH-1:0] id, input bit [`AXI4_ADDR_WIDTH-1:0] addr, input bit [7:0] len,
     input bit [2:0] size, input bit [1:0] burst, input bit [`AXI4_DATA_WIDTH-1:0] ref_data[$],
     input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
-  bit [`AXI4_DATA_WIDTH-1:0] filter_ref_data[$] = {};
+  bit [ `AXI4_DATA_WIDTH-1:0] filter_ref_data[$] = {};
+  bit [ `AXI4_ADDR_WIDTH-1:0] nxt_addr;
+  bit [`AXI4_WSTRB_WIDTH-1:0] ofset;
+
+  this.read(id, addr, len, size, burst);
+
+  nxt_addr = addr;
   foreach (ref_data[i]) begin
+    ofset = nxt_addr % `AXI4_WSTRB_WIDTH;
+
     unique case (size)
-      `AXI4_BURST_SIZE_1BYTE:  filter_ref_data[i] = ref_data[i][7:0];
-      `AXI4_BURST_SIZE_2BYTES: filter_ref_data[i] = ref_data[i][15:0];
-      `AXI4_BURST_SIZE_4BYTES: filter_ref_data[i] = ref_data[i][31:0];
+      `AXI4_BURST_SIZE_1BYTE: begin
+        unique case (ofset[2:0])
+          3'b000: filter_ref_data[i] = {56'b0, ref_data[i][7:0]};
+          3'b001: filter_ref_data[i] = {48'b0, ref_data[i][15:8], 8'b0};
+          3'b010: filter_ref_data[i] = {40'b0, ref_data[i][23:16], 16'b0};
+          3'b011: filter_ref_data[i] = {32'b0, ref_data[i][31:24], 24'b0};
+          3'b100: filter_ref_data[i] = {24'b0, ref_data[i][39:32], 32'b0};
+          3'b101: filter_ref_data[i] = {16'b0, ref_data[i][47:40], 40'b0};
+          3'b110: filter_ref_data[i] = {8'b0, ref_data[i][55:48], 48'b0};
+          3'b111: filter_ref_data[i] = {ref_data[i][63:56], 56'b0};
+        endcase
+      end
+      `AXI4_BURST_SIZE_2BYTES: begin
+        unique case (ofset[2:1])
+          2'b00: filter_ref_data[i] = {48'b0, ref_data[i][15:0]};
+          2'b01: filter_ref_data[i] = {32'b0, ref_data[i][31:16], 16'b0};
+          2'b10: filter_ref_data[i] = {16'b0, ref_data[i][47:32], 32'b0};
+          2'b11: filter_ref_data[i] = {ref_data[i][63:48], 48'b0};
+        endcase
+      end
+      `AXI4_BURST_SIZE_4BYTES: begin
+        unique case (ofset[2])
+          1'b0: filter_ref_data[i] = {32'b0, ref_data[i][31:0]};
+          1'b1: filter_ref_data[i] = {ref_data[i][63:32], 32'b0};
+        endcase
+      end
       `AXI4_BURST_SIZE_8BYTES: filter_ref_data[i] = ref_data[i][63:0];
       default: begin
         filter_ref_data[i] = ref_data[i];
         $display("no support now");
       end
     endcase
-  end
-  this.read(id, addr, len, size, burst);
 
+    nxt_addr = this.calc_addr(nxt_addr, size, burst);
+  end
+
+  // foreach (this.rd_data[i]) begin
+  // $display("rd data: %h", this.rd_data[i]);
+  // end
   Helper::check_queue(name, this.rd_data, filter_ref_data, cmp_type, log_level);
 endtask
 
