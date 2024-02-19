@@ -37,12 +37,10 @@
 (* no_boundary_optimization *)
 // verilog_format: on
 module cdc_fifo #(
-    parameter int DATA_WIDTH       = 32,
-    parameter int BUFFER_DEPTH     = 8,
-    parameter int SYNC_STAGES      = 2,
-    parameter int LOG_BUFFER_DEPTH = (BUFFER_DEPTH > 1) ? $clog2(BUFFER_DEPTH) : 1
+    parameter int DATA_WIDTH   = 32,
+    parameter int BUFFER_DEPTH = 8,
+    parameter int SYNC_STAGES  = 2
 ) (
-    // input  logic                  flush_i,
     input  logic                  src_clk_i,
     input  logic                  src_rst_n_i,
     input  logic [DATA_WIDTH-1:0] src_data_i,
@@ -55,6 +53,7 @@ module cdc_fifo #(
     output logic                  dst_valid_o,
     input  logic                  dst_ready_i
 );
+  localparam int LOG_BUFFER_DEPTH = (BUFFER_DEPTH > 1) ? $clog2(BUFFER_DEPTH) : 1;
 
   logic [BUFFER_DEPTH-1:0][DATA_WIDTH-1:0] s_int_mem;
   logic [LOG_BUFFER_DEPTH:0] s_wr_ptr_gray, s_rd_ptr_gray;
@@ -64,7 +63,7 @@ module cdc_fifo #(
                   .rst_n_i       (src_rst_n_i),
                   .data_i        (src_data_i),
                   .valid_i       (src_valid_i),
-                  .ready_o       (~src_ready_o),
+                  .ready_o       (src_ready_o),
       (* async *) .async_data_o  (s_int_mem),
       (* async *) .async_wr_ptr_o(s_wr_ptr_gray),
       (* async *) .async_rd_ptr_i(s_rd_ptr_gray),
@@ -117,11 +116,16 @@ module cdc_fifo_src #(
   assign async_wr_ptr_o = s_wr_ptr_gray_q;
 
   for (genvar i = 0; i < BUFFER_DEPTH; i++) begin : CDC_FIFO_SRC_DATA
-    dffer#(DATA_WIDTH) (
-        clk_i, rst_n_i, s_hdshk && (s_wr_ptr_bin[LOG_BUFFER_DEPTH-1:0] == i), data_i, s_data[i]
+    dffer #(DATA_WIDTH) u_data_dffer (
+        clk_i,
+        rst_n_i,
+        s_hdshk && (s_wr_ptr_bin[LOG_BUFFER_DEPTH-1:0] == i),
+        data_i,
+        s_data[i]
     );
   end
 
+  // rd
   cdc_sync #(
       .STAGE     (SYNC_STAGES),
       .DATA_WIDTH(PTR_WIDTH)
@@ -137,6 +141,7 @@ module cdc_fifo_src #(
       s_rd_ptr_bin
   );
 
+  // wr
   gray2bin #(PTR_WIDTH) u_wr_ptr_g2b (
       s_wr_ptr_gray_q,
       s_wr_ptr_bin
@@ -180,7 +185,7 @@ module cdc_fifo_dst #(
   localparam int PTR_WIDTH = LOG_BUFFER_DEPTH + 1;
   localparam logic [PTR_WIDTH-1:0] PTR_EMPTY = '0;
 
-  logic [BUFFER_DEPTH-1:0][DATA_WIDTH-1:0] s_data;
+  logic [DATA_WIDTH-1:0] s_data;
   logic [PTR_WIDTH-1:0] s_rd_ptr_gray_q, s_rd_ptr_gray_d;
   logic [PTR_WIDTH-1:0] s_rd_ptr_bin, s_rd_ptr_bin_nxt;
   logic [PTR_WIDTH-1:0] s_wr_ptr_gray, s_wr_ptr_bin;
@@ -227,11 +232,10 @@ module cdc_fifo_dst #(
       s_rd_ptr_gray_q
   );
 
-  spill_register #(
-      .T(T)
-  ) u_spill_register (
+  spill_register #(DATA_WIDTH) u_spill_register (
       .clk_i  (clk_i),
       .rst_n_i(rst_n_i),
+      .flush_i(1'b0),
       .valid_i(s_valid),
       .ready_o(s_ready),
       .data_i (s_data),
