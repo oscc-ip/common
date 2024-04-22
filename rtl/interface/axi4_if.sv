@@ -8,8 +8,8 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_APB4_IF_SV
-`define INC_APB4_IF_SV
+`ifndef INC_AXI4_IF_SV
+`define INC_AXI4_IF_SV
 
 `include "axi4_define.sv"
 
