@@ -64,7 +64,7 @@ module tech_regfile_bm #(
   assign s_en  = ~en_i;
   assign s_wen = ~wen_i;
 
-  for (genvar i = 0; i < BIT_WIDTH / 8; i++) begin
+  for (genvar i = 0; i < BIT_WIDTH / 8; i++) begin: REGFILE_BIT_MASK_BLOCK
     assign s_bm[i*8+:8] = ~{8{bm_i[i]}};
   end
 
