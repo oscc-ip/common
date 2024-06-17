@@ -1,3 +1,4 @@
+
 // Copyright (c) 2023 Beijing Institute of Open Source Chip
 // common is licensed under Mulan PSL v2.
 // You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -81,7 +82,8 @@ module edge_det_sync #(
     input  logic                  clk_i,
     input  logic                  rst_n_i,
     input  logic [DATA_WIDTH-1:0] dat_i,
-    output logic [DATA_WIDTH-1:0] rfe_o
+    output logic [DATA_WIDTH-1:0] re_o,
+    output logic [DATA_WIDTH-1:0] fe_o
 );
 
   logic [DATA_WIDTH-1:0] s_dat_d, s_dat_q;
@@ -93,7 +95,8 @@ module edge_det_sync #(
       .dat_o  (s_dat_q)
   );
 
-  assign rfe_o = s_dat_q ^ s_dat_d;
+  assign re_o  = (~s_dat_q) & s_dat_d;
+  assign fe_o  = s_dat_q & (~s_dat_d);
 endmodule
 
 module edge_det_sync_re #(
