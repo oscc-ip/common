@@ -83,14 +83,24 @@ module axi4_slv_fsm #(
     output logic                         rvalid,
     input  logic                         rready,
     // user interface
-    output loigc                         s_usr_en_o,
-    output loigc                         s_usr_wen_o,
-    output logic [   USR_ADDR_WIDTH-1:0] s_usr_addr_o,  // TODO:
+    output logic                         s_usr_en_o,
+    output logic                         s_usr_wen_o,
+    output logic [   USR_ADDR_WIDTH-1:0] s_usr_addr_o,
     output logic [`AXI4_WSTRB_WIDTH-1:0] s_usr_bm_i,
     input  logic [ `AXI4_DATA_WIDTH-1:0] s_usr_dat_i,
+    input  logic                         s_usr_awready_i,
+    input  logic                         s_usr_wready_i,
+    input  logic                         s_usr_bvalid_i,
+    input  logic                         s_usr_arready_i,
+    input  logic                         s_usr_rvalid_i,
     output logic [ `AXI4_DATA_WIDTH-1:0] s_usr_dat_o
 );
 
+  assign awready = s_usr_awready_i;
+  assign wready  = s_usr_wready_i;
+  assign bvalid  = s_usr_bvalid_i;
+  assign arready = s_usr_arready_i;
+  assign rvalid  = s_usr_rvalid_i;
   // AXI has the following rules governing the use of bursts:
   // - a burst must not cross a 4KB address boundary
   typedef enum logic [1:0] {
@@ -142,19 +152,19 @@ module axi4_slv_fsm #(
     s_usr_en_o       = 1'b0;
     s_usr_addr_o     = '0;
     // axi4 request
-    awready          = 1'b0;
-    arready          = 1'b0;
+    // awready          = 1'b0;
+    // arready          = 1'b0;
     // axi4 read
-    rvalid           = 1'b0;
+    // rvalid           = 1'b0;
     rdata            = s_usr_dat_i;
     rresp            = '0;
     rlast            = '0;
     rid              = s_axi_req_q.id;
     ruser            = 1'b0;
     // axi4 write
-    wready           = 1'b0;
+    // wready           = 1'b0;
     // axi4 response
-    bvalid           = 1'b0;
+    // bvalid           = 1'b0;
     bresp            = 1'b0;
     bid              = 1'b0;
     buser            = 1'b0;
@@ -240,9 +250,8 @@ module axi4_slv_fsm #(
         end
       end
       SEND_B: begin
-        bvalid = 1'b1;
-        bid    = s_axi_req_q.id;
-        if (bready) s_state_d = IDLE;
+        bid = s_axi_req_q.id;
+        if (bready && bvalid) s_state_d = IDLE;
       end
     endcase
   end
