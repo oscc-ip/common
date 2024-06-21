@@ -17,6 +17,7 @@
 `define AXI4_DATA_WIDTH          64
 `define AXI4_WSTRB_WIDTH         (`AXI4_DATA_WIDTH / 8)
 `define AXI4_DATA_BYTES          (`AXI4_DATA_WIDTH / 8)
+`define AXI4_DATA_BLOG           $clog2(`AXI4_DATA_BYTES)
 `define AXI4_USER_WIDTH          4
 `define AXI4_ID_WIDTH            4
 
