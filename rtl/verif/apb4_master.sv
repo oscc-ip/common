@@ -11,6 +11,7 @@
 `ifndef INC_APB4_MASTER_SV
 `define INC_APB4_MASTER_SV
 
+`include "setting.sv"
 `include "helper.sv"
 `include "test_base.sv"
 
@@ -58,7 +59,7 @@ endtask
 task automatic APB4Master::write(input bit [31:0] addr, input bit [31:0] data);
   this.apb4.pprot = '0;
   @(posedge this.apb4.pclk);
-  #1;
+  #`REGISTER_DELAY;
   this.apb4.paddr  = addr;
   this.apb4.psel   = 1'b1;
   this.apb4.pwrite = 1'b1;
@@ -66,10 +67,10 @@ task automatic APB4Master::write(input bit [31:0] addr, input bit [31:0] data);
   this.apb4.pstrb  = '1;  // refer to APB4 LRM
 
   @(posedge this.apb4.pclk);
-  #1;
+  #`REGISTER_DELAY;
   this.apb4.penable = 1'b1;
   @(posedge this.apb4.pclk && this.apb4.pready);
-  #1;
+  #`REGISTER_DELAY;
   this.apb4.paddr   = 'x;
   this.apb4.psel    = '0;
   this.apb4.penable = '0;
@@ -83,19 +84,19 @@ task automatic APB4Master::read(input bit [31:0] addr);
   this.apb4.pprot = '0;
   this.apb4.pstrb = '0;
   @(posedge this.apb4.pclk);
-  #1;
+  #`REGISTER_DELAY;
   this.apb4.paddr  = addr;
   this.apb4.psel   = 1'b1;
   this.apb4.pwrite = 1'b0;
   this.apb4.pwdata = 'x;
 
   @(posedge this.apb4.pclk);
-  #1;
+  #`REGISTER_DELAY;
   this.apb4.penable = 1'b1;
   @(posedge this.apb4.pclk && this.apb4.pready);
   val          = this.apb4.prdata;  // NOTE: read by posedge
   this.rd_data = val;
-  #1;
+  #`REGISTER_DELAY;
   this.apb4.paddr   = 'x;
   this.apb4.psel    = '0;
   this.apb4.penable = '0;
