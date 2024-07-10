@@ -136,8 +136,8 @@ module clk_int_odd_div_static #(
 endmodule
 
 // NOTE: need to make sure the div_i is driven by reg
-// div_val: 2 * (div_i + 1)
-module clk_int_even_div_simple #(
+// div_val: (div_i + 1)
+module clk_int_div_simple #(
     parameter int DIV_VALUE_WIDTH  = 32,
     parameter int DONE_DELAY_WIDTH = 3
 ) (

@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module clk_int_even_div_simple_tb ();
+module clk_int_div_simple_tb ();
   logic rst_n_i, clk_i;
   logic clk_o, div_i;
   logic s_ready, s_done;
@@ -30,7 +30,7 @@ module clk_int_even_div_simple_tb ();
   initial begin
     if ($test$plusargs("dump_fst_wave")) begin
       $dumpfile("sim.wave");
-      $dumpvars(0, clk_int_even_div_simple_tb);
+      $dumpvars(0, clk_int_div_simple_tb);
     end else if ($test$plusargs("default_args")) begin
       $display("=========sim default args===========");
     end
@@ -62,7 +62,7 @@ module clk_int_even_div_simple_tb ();
   );
 
 
-  clk_int_even_div_simple u_clk_int_even_div_simple (
+  clk_int_div_simple u_clk_int_even_simple (
       clk_i,
       rst_n_i,
       r_div,
