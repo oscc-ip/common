@@ -11,6 +11,7 @@
 `ifndef INC_AXI4_MASTER_SV
 `define INC_AXI4_MASTER_SV
 
+`include "setting.sv"
 `include "helper.sv"
 `include "test_base.sv"
 `include "axi4_define.sv"
@@ -147,7 +148,7 @@ task automatic AXI4Master::write(
 
   // aw channel
   @(posedge this.axi4.aclk);
-  #1;
+  #`REGISTER_DELAY;
   this.axi4.awid    = id;
   this.axi4.awaddr  = addr;
   this.axi4.awlen   = len - 1;
@@ -159,7 +160,7 @@ task automatic AXI4Master::write(
   while (~this.axi4.awready) begin
     @(posedge this.axi4.aclk);
   end
-  #1;
+  #`REGISTER_DELAY;
   // $display("%t aw trigger", $time);
   this.axi4.awid    = '0;
   this.axi4.awaddr  = 'x;
@@ -168,7 +169,7 @@ task automatic AXI4Master::write(
   this.axi4.awburst = `AXI4_BURST_TYPE_FIXED;
   this.axi4.awvalid = '0;
   @(negedge this.axi4.aclk);
-  #1;
+  #`REGISTER_DELAY;
   // w burst channel
   tmp_addr = addr;
   for (int i = 0; i < len; i++) begin
@@ -181,7 +182,7 @@ task automatic AXI4Master::write(
     while (~this.axi4.wready) begin
       @(posedge this.axi4.aclk);
     end
-    #1;
+    #`REGISTER_DELAY;
     // $display("%t w burst trigger", $time);
   end
 
@@ -209,7 +210,7 @@ task automatic AXI4Master::write(
       `AXI4_RESP_DECODE_ERROR: $display("%t DECERR", $time);
     endcase
   end
-  #1;
+  #`REGISTER_DELAY;
   this.axi4.bready = 1'b0;
   @(negedge this.axi4.aclk);
 endtask
@@ -223,7 +224,7 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
   this.rd_data = {};
   // ar channel
   @(posedge this.axi4.aclk);
-  #1;
+  #`REGISTER_DELAY;
   this.axi4.arid    = id;
   this.axi4.araddr  = addr;
   this.axi4.arlen   = len - 1;
@@ -235,7 +236,7 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
   while (~this.axi4.arready) begin
     @(posedge this.axi4.aclk);
   end
-  #1;
+  #`REGISTER_DELAY;
   // $display("%t ar trigger", $time);
   this.axi4.arid    = '0;
   this.axi4.araddr  = 'x;
@@ -248,7 +249,7 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
   // r burst channel
   tmp_addr = addr;
   @(posedge this.axi4.aclk);
-  #1;
+  #`REGISTER_DELAY;
   this.axi4.rready = 1'b1;
   for (int i = 0; i < len; i++) begin
     @(posedge this.axi4.aclk);
@@ -271,7 +272,7 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
       @(negedge this.axi4.aclk);
       tmp_addr = this.calc_addr(tmp_addr, size, burst);
     end
-    #1;
+    #`REGISTER_DELAY;
   end
 
   this.axi4.rready = 1'b0;

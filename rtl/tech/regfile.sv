@@ -11,6 +11,8 @@
 `ifndef INC_REGFILE_SV
 `define INC_REGFILE_SV
 
+`include "setting.sv"
+
 // this file only include behavioral model, for ASIC tape-out need to reimplement those models
 module tech_regfile #(
     parameter int BIT_WIDTH  = 128,
@@ -31,9 +33,9 @@ module tech_regfile #(
   logic [BIT_WIDTH-1:0] r_intern_ram[0:WORD_DEPTH-1];
   always_ff @(posedge clk_i) begin
     if (~en_i && ~wen_i) begin
-      r_intern_ram[addr_i] <= #1 dat_i;
+      r_intern_ram[addr_i] <= #`REGISTER_DELAY dat_i;
     end else begin
-      dat_o <= #1 (~en_i && wen_i) ? r_intern_ram[addr_i] : {(BIT_WIDTH / 32) {$random}};
+      dat_o <= #`REGISTER_DELAY (~en_i && wen_i) ? r_intern_ram[addr_i] : {(BIT_WIDTH / 32) {$random}};
     end
   end
 `endif
@@ -70,9 +72,9 @@ module tech_regfile_bm #(
 
   always_ff @(posedge clk_i) begin
     if (s_en && s_wen) begin
-      r_intern_ram[addr_i] <= #1 (dat_i & s_bm) | (r_intern_ram[addr_i] & ~s_bm);
+      r_intern_ram[addr_i] <= #`REGISTER_DELAY (dat_i & s_bm) | (r_intern_ram[addr_i] & ~s_bm);
     end
-    dat_o <= #1 (s_en && ~s_wen) ? r_intern_ram[addr_i] : {(BIT_WIDTH / 32) {$random}};
+    dat_o <= #`REGISTER_DELAY (s_en && ~s_wen) ? r_intern_ram[addr_i] : {(BIT_WIDTH / 32) {$random}};
   end
 `endif
 endmodule

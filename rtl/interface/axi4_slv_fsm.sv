@@ -23,6 +23,7 @@
 `ifndef INC_AXI4_SLV_FSM_SV
 `define INC_AXI4_SLV_FSM_SV
 
+`include "setting.sv"
 `include "register.sv"
 `include "axi4_define.sv"
 `include "axi4_addr_gen.sv"
@@ -266,11 +267,11 @@ module axi4_slv_fsm #(
 
   always_ff @(posedge aclk, negedge aresetn) begin
     if (~aresetn) begin
-      s_state_q   <= #1 IDLE;
-      s_axi_req_q <= #1'0;
+      s_state_q   <= #`REGISTER_DELAY IDLE;
+      s_axi_req_q <= #`REGISTER_DELAY '0;
     end else begin
-      s_state_q   <= #1 s_state_d;
-      s_axi_req_q <= #1 s_axi_req_d;
+      s_state_q   <= #`REGISTER_DELAY s_state_d;
+      s_axi_req_q <= #`REGISTER_DELAY s_axi_req_d;
     end
   end
 endmodule
