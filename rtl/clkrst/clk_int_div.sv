@@ -147,11 +147,13 @@ module clk_int_div_simple #(
     input  logic                       div_valid_i,
     output logic                       div_ready_o,
     output logic                       div_done_o,
-    output logic                       clk_trg_o
+    output logic                       clk_trg_o,
+    output logic                       clk_o
 );
 
   logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q;
   logic [DONE_DELAY_WIDTH-1:0] s_div_done_d, s_div_done_q;
+  logic s_clk_d, s_clk_q;
   logic div_hdshk;
 
   assign div_ready_o = 1'b1;
@@ -166,12 +168,24 @@ module clk_int_div_simple #(
       s_cnt_d = '0;
     end
   end
-
   dffr #(DIV_VALUE_WIDTH) u_cnt_dffr (
       clk_i,
       rst_n_i,
       s_cnt_d,
       s_cnt_q
+  );
+
+  // if div_i == 0, clk_o = clk_i
+  // if div_i == 1, ckl_o = clk_i / 2 chg on s_cnt_q == 0
+  // if div_i == 2, clk_o = clk_i / 3 chg on s_cnt_q == 0
+  // if div_i == 3, clk_o = clk_i / 4 chg on s_cnt_q == 1
+  assign clk_o   = div_i == 0 ? clk_i : s_clk_q;
+  assign s_clk_d = (s_cnt_q == (div_i - 1) / 2) || (s_cnt_q == div_i) ? ~s_clk_q : s_clk_q;
+  dffr #(1) u_clk_dffr (
+      clk_i,
+      rst_n_i,
+      s_clk_d,
+      s_clk_q
   );
 
   assign div_done_o = s_div_done_q == {DONE_DELAY_WIDTH{1'b1}};
