@@ -12,6 +12,7 @@
 `define INC_GPIO_PAD_SV
 
 // this file only include digital IO's behavioral model, for ASIC tape-out need to reimplement those models
+// oen_i: high active
 module tri_pdu_pad_h (
     input  logic i_i,
     input  logic oen_i,
@@ -23,7 +24,7 @@ module tri_pdu_pad_h (
 `ifdef TRI_PDU_PAD_H_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  assign pad_io = oen_i ? 1'bz : i_i;
+  assign pad_io = oen_i ? i_i : 1'bz;
   assign c_o    = pad_io;
 `endif
 
@@ -40,7 +41,7 @@ module tri_pdu_pad_v (
 `ifdef TRI_PDU_PAD_V_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  assign pad_io = oen_i ? 1'bz : i_i;
+  assign pad_io = oen_i ? i_i : 1'bz;
   assign c_o    = pad_io;
 `endif
 
@@ -57,7 +58,7 @@ module tri_pd_pad_h (
 `ifdef TRI_PD_PAD_H_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  assign pad_io = oen_i ? 1'bz : i_i;
+  assign pad_io = oen_i ? i_i : 1'bz;
   assign c_o    = pad_io;
 `endif
 
@@ -74,7 +75,7 @@ module tri_pd_pad_v (
 `ifdef TRI_PD_PAD_V_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  assign pad_io = oen_i ? 1'bz : i_i;
+  assign pad_io = oen_i ? i_i : 1'bz;
   assign c_o    = pad_io;
 `endif
 
@@ -91,7 +92,7 @@ module tri_pu_pad_h (
 `ifdef TRI_PU_PAD_H_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  assign pad_io = oen_i ? 1'bz : i_i;
+  assign pad_io = oen_i ? i_i : 1'bz;
   assign c_o    = pad_io;
 `endif
 
@@ -108,7 +109,7 @@ module tri_pu_pad_v (
 `ifdef TRI_PU_PAD_V_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
-  assign pad_io = oen_i ? 1'bz : i_i;
+  assign pad_io = oen_i ? i_i : 1'bz;
   assign c_o    = pad_io;
 `endif
 
