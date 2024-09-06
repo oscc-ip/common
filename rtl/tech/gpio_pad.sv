@@ -115,7 +115,7 @@ module tri_pu_pad_v (
 
 endmodule
 
-module osc_pad (
+module osc_pad_h (
     input  logic ds0_i,   // driver strength
     input  logic ds1_i,   // driver strength
     input  logic en_i,
@@ -124,7 +124,25 @@ module osc_pad (
     output logic xc_o
 );
 
-`ifdef OSC_PAD_BACKEND
+`ifdef OSC_PAD_H_BACKEND
+  $error("need to instantiate specific technology cell in this block and remove this statement");
+`else
+  assign xout_o = en_i ? xin_i : 1'b0;
+  assign xc_o   = en_i ? xin_i : 1'b0;
+`endif
+
+endmodule
+
+module osc_pad_v (
+    input  logic ds0_i,   // driver strength
+    input  logic ds1_i,   // driver strength
+    input  logic en_i,
+    input  logic xin_i,
+    output logic xout_o,
+    output logic xc_o
+);
+
+`ifdef OSC_PAD_V_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign xout_o = en_i ? xin_i : 1'b0;
