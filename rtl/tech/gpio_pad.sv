@@ -20,7 +20,7 @@ module tri_pd_pad_h (
     inout  wire  pad_io
 );
 
-`ifdef BACKEND
+`ifdef TRI_PD_PAD_H_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign pad_io = oen_i ? 1'bz : i_i;
@@ -37,7 +37,7 @@ module tri_pd_pad_v (
     inout  wire  pad_io
 );
 
-`ifdef BACKEND
+`ifdef TRI_PD_PAD_V_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign pad_io = oen_i ? 1'bz : i_i;
@@ -54,7 +54,7 @@ module tri_pu_pad_h (
     inout  wire  pad_io
 );
 
-`ifdef BACKEND
+`ifdef TRI_PU_PAD_H_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign pad_io = oen_i ? 1'bz : i_i;
@@ -71,7 +71,7 @@ module tri_pu_pad_v (
     inout  wire  pad_io
 );
 
-`ifdef BACKEND
+`ifdef TRI_PU_PAD_V_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign pad_io = oen_i ? 1'bz : i_i;
@@ -89,7 +89,7 @@ module osc_pad (
     output logic xc_o
 );
 
-`ifdef BACKEND
+`ifdef OSC_PAD_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign xout_o = en_i ? xin_i : 1'b0;

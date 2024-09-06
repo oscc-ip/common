@@ -176,7 +176,7 @@ module clk_int_div_simple #(
   );
 
   // if div_i == 0, clk_o = clk_i
-  // if div_i == 1, ckl_o = clk_i / 2 chg on s_cnt_q == 0
+  // if div_i == 1, clk_o = clk_i / 2 chg on s_cnt_q == 0
   // if div_i == 2, clk_o = clk_i / 3 chg on s_cnt_q == 0
   // if div_i == 3, clk_o = clk_i / 4 chg on s_cnt_q == 1
   assign clk_o   = div_i == 0 ? clk_i : s_clk_q;
