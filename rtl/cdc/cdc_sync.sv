@@ -24,7 +24,7 @@ module cdc_sync #(
 );
 
   logic [DATA_WIDTH-1:0] s_sync_dat[0:STAGE-1];
-  for (genvar i = 0; i < STAGE; i++) begin
+  for (genvar i = 0; i < STAGE; i++) begin : CDC_SYNC_BLOCK
     if (i == 0) begin
       dffr #(DATA_WIDTH) u_sync_dffr (
           clk_i,
@@ -57,7 +57,7 @@ module cdc_sync_det #(
 );
 
   logic [DATA_WIDTH-1:0] s_sync_dat[0:STAGE-1];
-  for (genvar i = 0; i < STAGE; i++) begin
+  for (genvar i = 0; i < STAGE; i++) begin : CDC_SYNC_DET_BLOCK
     if (i == 0) begin
       dffr #(DATA_WIDTH) u_sync_dffr (
           clk_i,

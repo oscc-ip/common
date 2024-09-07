@@ -27,7 +27,7 @@ module lfsr_galois #(
 );
 
   logic [DATA_WIDTH-1:0] s_shift_d, s_shift_q;
-  for (genvar i = 0; i < DATA_WIDTH; i++) begin
+  for (genvar i = 0; i < DATA_WIDTH; i++) begin : LFSR_GALOIS_BLOCK
     if (i == DATA_WIDTH - 1) begin
       assign s_shift_d[i] = wr_i ? dat_i[i] : s_shift_q[0];
     end else begin
@@ -65,7 +65,7 @@ module lfsr_fibonacci #(
   logic [DATA_WIDTH-1:0] s_shift_d, s_shift_q;
 
   assign dat_o = s_shift_q;
-  for (genvar i = 0; i <= DATA_WIDTH - 1; i++) begin
+  for (genvar i = 0; i <= DATA_WIDTH - 1; i++) begin : LFSR_FIBONACCI_BLOCK
     if (i == DATA_WIDTH - 1) begin
       assign s_shift_d[i] = wr_i ? dat_i[i] : s_shift_q[0] ^ s_shift_q[1];
     end else begin

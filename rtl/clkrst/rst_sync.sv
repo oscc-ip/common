@@ -20,7 +20,7 @@ module rst_sync #(
 );
 
   logic [STAGE-1:0] s_rst_sync;
-  for (genvar i = 0; i < STAGE; i++) begin
+  for (genvar i = 0; i < STAGE; i++) begin : RST_SYNC_BLOCK
     if (i == 0) begin
       dffr #(1) u_sync_dffr (
           clk_i,
