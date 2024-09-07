@@ -27,7 +27,7 @@ module tech_regfile #(
 
 );
 
-`ifdef BACKEND
+`ifdef TECH_REGFILE_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   logic [BIT_WIDTH-1:0] r_intern_ram[0:WORD_DEPTH-1];
@@ -56,7 +56,7 @@ module tech_regfile_bm #(
 
 );
 
-`ifdef BACKEND
+`ifdef TECH_REGFILE_BM_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   logic s_en, s_wen;
