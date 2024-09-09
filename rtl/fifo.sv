@@ -184,6 +184,7 @@ module stream_fifo #(
       s_cnt_q
   );
 
+  // BUG: need to reimplement this block
   tech_regfile_bm #(
       .BIT_WIDTH (DATA_WIDTH),
       .WORD_DEPTH(BUFFER_DEPTH)
