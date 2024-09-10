@@ -14,7 +14,7 @@ module clk_buf (
     output logic clk_o
 );
 
-`ifdef BACKEND
+`ifdef CLK_BUF_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign clk_o = clk_i;
@@ -28,7 +28,7 @@ module clk_n (
     output logic clk_o
 );
 
-`ifdef BACKEND
+`ifdef CLK_N_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign clk_o = ~clk_i;
@@ -42,7 +42,7 @@ module clk_an2 (
     output logic clk_o
 );
 
-`ifdef BACKEND
+`ifdef CLK_AN2_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign clk_o = clk1_i & clk2_i;
@@ -57,7 +57,7 @@ module clk_nd2 (
     output logic clk_o
 );
 
-`ifdef BACKEND
+`ifdef CLK_ND2_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign clk_o = ~(clk1_i & clk2_i);
@@ -72,7 +72,7 @@ module clk_mux2 (
     output logic clk_o
 );
 
-`ifdef BACKEND
+`ifdef CLK_MUX2_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign clk_o = en_i ? clk2_i : clk1_i;
@@ -86,7 +86,7 @@ module clk_xor2 (
     output logic clk_o
 );
 
-`ifdef BACKEND
+`ifdef CLK_XOR2_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   assign clk_o = clk1_i ^ clk2_i;
@@ -101,7 +101,7 @@ module clk_icg (
     output logic clk_o
 );
 
-`ifdef BACKEND
+`ifdef CLK_ICG_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   logic r_clk_en;
@@ -123,7 +123,7 @@ module clk_icg2 (
     output logic clk_o
 );
 
-`ifdef BACKEND
+`ifdef CLK_ICG2_BACKEND
   $error("need to instantiate specific technology cell in this block and remove this statement");
 `else
   logic r_clk_en;
