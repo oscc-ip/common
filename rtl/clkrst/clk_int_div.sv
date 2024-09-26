@@ -147,6 +147,7 @@ module clk_int_div_simple #(
     input  logic                       div_valid_i,
     output logic                       div_ready_o,
     output logic                       div_done_o,
+    output logic [DIV_VALUE_WIDTH-1:0] clk_cnt_o,
     output logic                       clk_trg_o,
     output logic                       clk_o
 );
@@ -158,6 +159,7 @@ module clk_int_div_simple #(
 
   assign div_ready_o = 1'b1;
   assign div_hdshk   = div_valid_i & div_ready_o;
+  assign clk_cnt_o   = s_cnt_q;
   assign clk_trg_o   = s_cnt_q == div_i;
 
   always_comb begin
