@@ -76,25 +76,25 @@ module axi4_slv_fsm #(
     input  logic                        arvalid,
     output logic                        arready,
 
-    output logic [   `AXI4_ID_WIDTH-1:0] rid,
-    output logic [ `AXI4_DATA_WIDTH-1:0] rdata,
-    output logic [                  1:0] rresp,
-    output logic                         rlast,
-    output logic [ `AXI4_USER_WIDTH-1:0] ruser,
-    output logic                         rvalid,
-    input  logic                         rready,
+    output logic [                `AXI4_ID_WIDTH-1:0] rid,
+    output logic [              `AXI4_DATA_WIDTH-1:0] rdata,
+    output logic [                               1:0] rresp,
+    output logic                                      rlast,
+    output logic [              `AXI4_USER_WIDTH-1:0] ruser,
+    output logic                                      rvalid,
+    input  logic                                      rready,
     // user interface
-    output logic                         s_usr_en_o,
-    output logic                         s_usr_wen_o,
-    output logic [   USR_ADDR_WIDTH-1:0] s_usr_addr_o,
-    output logic [`AXI4_WSTRB_WIDTH-1:0] s_usr_bm_i,
-    input  logic [ `AXI4_DATA_WIDTH-1:0] s_usr_dat_i,
-    input  logic                         s_usr_awready_i,
-    input  logic                         s_usr_wready_i,
-    input  logic                         s_usr_bvalid_i,
-    input  logic                         s_usr_arready_i,
-    input  logic                         s_usr_rvalid_i,
-    output logic [ `AXI4_DATA_WIDTH-1:0] s_usr_dat_o
+    output logic                                      s_usr_en_o,
+    output logic                                      s_usr_wen_o,
+    output logic [USR_ADDR_WIDTH-`AXI4_DATA_BLOG-1:0] s_usr_addr_o,
+    output logic [             `AXI4_WSTRB_WIDTH-1:0] s_usr_bm_o,
+    output logic [              `AXI4_DATA_WIDTH-1:0] s_usr_dat_o,
+    input  logic [              `AXI4_DATA_WIDTH-1:0] s_usr_dat_i,
+    input  logic                                      s_usr_awready_i,
+    input  logic                                      s_usr_wready_i,
+    input  logic                                      s_usr_bvalid_i,
+    input  logic                                      s_usr_arready_i,
+    input  logic                                      s_usr_rvalid_i
 );
 
   assign awready = s_usr_awready_i;
@@ -148,7 +148,7 @@ module axi4_slv_fsm #(
     s_trans_cnt_d    = s_trans_cnt_q;
     // usr
     s_usr_dat_o      = wdata;
-    s_usr_bm_i       = wstrb;
+    s_usr_bm_o       = wstrb;
     s_usr_wen_o      = 1'b0;
     s_usr_en_o       = 1'b0;
     s_usr_addr_o     = '0;
