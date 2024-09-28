@@ -33,49 +33,45 @@ module axi4_slv_fsm #(
     parameter int USR_ADDR_SIZE  = 64 * 1024 * 1024,
     parameter int USR_ADDR_WIDTH = $clog2(USR_ADDR_SIZE)  // NOTE: dont modify!
 ) (
-    input  logic                        aclk,
-    input  logic                        aresetn,
-    input  logic [  `AXI4_ID_WIDTH-1:0] awid,
-    input  logic [`AXI4_ADDR_WIDTH-1:0] awaddr,
-    input  logic [                 7:0] awlen,
-    input  logic [                 2:0] awsize,
-    input  logic [                 1:0] awburst,
-    input  logic                        awlock,
-    input  logic [                 3:0] awcache,
-    input  logic [                 2:0] awprot,
-    input  logic [                 3:0] awqos,
-    input  logic [                 3:0] awregion,
-    input  logic [`AXI4_USER_WIDTH-1:0] awuser,
-    input  logic                        awvalid,
-    output logic                        awready,
-
-    input  logic [  `AXI4_DATA_WIDTH-1:0] wdata,
-    input  logic [`AXI4_DATA_WIDTH/8-1:0] wstrb,
-    input  logic                          wlast,
-    input  logic [  `AXI4_USER_WIDTH-1:0] wuser,
-    input  logic                          wvalid,
-    output logic                          wready,
-
-    output logic [  `AXI4_ID_WIDTH-1:0] bid,
-    output logic [                 1:0] bresp,
-    output logic [`AXI4_USER_WIDTH-1:0] buser,
-    output logic                        bvalid,
-    input  logic                        bready,
-
-    input  logic [  `AXI4_ID_WIDTH-1:0] arid,
-    input  logic [`AXI4_ADDR_WIDTH-1:0] araddr,
-    input  logic [                 7:0] arlen,
-    input  logic [                 2:0] arsize,
-    input  logic [                 1:0] arburst,
-    input  logic                        arlock,
-    input  logic [                 3:0] arcache,
-    input  logic [                 2:0] arprot,
-    input  logic [                 3:0] arqos,
-    input  logic [                 3:0] arregion,
-    input  logic [`AXI4_USER_WIDTH-1:0] aruser,
-    input  logic                        arvalid,
-    output logic                        arready,
-
+    input  logic                                      aclk,
+    input  logic                                      aresetn,
+    input  logic [                `AXI4_ID_WIDTH-1:0] awid,
+    input  logic [              `AXI4_ADDR_WIDTH-1:0] awaddr,
+    input  logic [                               7:0] awlen,
+    input  logic [                               2:0] awsize,
+    input  logic [                               1:0] awburst,
+    input  logic                                      awlock,
+    input  logic [                               3:0] awcache,
+    input  logic [                               2:0] awprot,
+    input  logic [                               3:0] awqos,
+    input  logic [                               3:0] awregion,
+    input  logic [              `AXI4_USER_WIDTH-1:0] awuser,
+    input  logic                                      awvalid,
+    output logic                                      awready,
+    input  logic [              `AXI4_DATA_WIDTH-1:0] wdata,
+    input  logic [            `AXI4_DATA_WIDTH/8-1:0] wstrb,
+    input  logic                                      wlast,
+    input  logic [              `AXI4_USER_WIDTH-1:0] wuser,
+    input  logic                                      wvalid,
+    output logic                                      wready,
+    output logic [                `AXI4_ID_WIDTH-1:0] bid,
+    output logic [                               1:0] bresp,
+    output logic [              `AXI4_USER_WIDTH-1:0] buser,
+    output logic                                      bvalid,
+    input  logic                                      bready,
+    input  logic [                `AXI4_ID_WIDTH-1:0] arid,
+    input  logic [              `AXI4_ADDR_WIDTH-1:0] araddr,
+    input  logic [                               7:0] arlen,
+    input  logic [                               2:0] arsize,
+    input  logic [                               1:0] arburst,
+    input  logic                                      arlock,
+    input  logic [                               3:0] arcache,
+    input  logic [                               2:0] arprot,
+    input  logic [                               3:0] arqos,
+    input  logic [                               3:0] arregion,
+    input  logic [              `AXI4_USER_WIDTH-1:0] aruser,
+    input  logic                                      arvalid,
+    output logic                                      arready,
     output logic [                `AXI4_ID_WIDTH-1:0] rid,
     output logic [              `AXI4_DATA_WIDTH-1:0] rdata,
     output logic [                               1:0] rresp,
@@ -84,24 +80,26 @@ module axi4_slv_fsm #(
     output logic                                      rvalid,
     input  logic                                      rready,
     // user interface
-    output logic                                      s_usr_en_o,
-    output logic                                      s_usr_wen_o,
-    output logic [USR_ADDR_WIDTH-`AXI4_DATA_BLOG-1:0] s_usr_addr_o,
-    output logic [             `AXI4_WSTRB_WIDTH-1:0] s_usr_bm_o,
-    output logic [              `AXI4_DATA_WIDTH-1:0] s_usr_dat_o,
-    input  logic [              `AXI4_DATA_WIDTH-1:0] s_usr_dat_i,
-    input  logic                                      s_usr_awready_i,
-    input  logic                                      s_usr_wready_i,
-    input  logic                                      s_usr_bvalid_i,
-    input  logic                                      s_usr_arready_i,
-    input  logic                                      s_usr_rvalid_i
+    output logic                                      usr_start_o,
+    output logic                                      usr_rdwr_start_o,
+    output logic                                      usr_wen_o,
+    output logic [                               7:0] usr_wlen_o,
+    output logic [USR_ADDR_WIDTH-`AXI4_DATA_BLOG-1:0] usr_addr_o,
+    output logic [             `AXI4_WSTRB_WIDTH-1:0] usr_bm_o,
+    output logic [              `AXI4_DATA_WIDTH-1:0] usr_dat_o,
+    input  logic [              `AXI4_DATA_WIDTH-1:0] usr_dat_i,
+    input  logic                                      usr_awready_i,
+    input  logic                                      usr_wready_i,
+    input  logic                                      usr_bvalid_i,
+    input  logic                                      usr_arready_i,
+    input  logic                                      usr_rvalid_i
 );
 
-  assign awready = s_usr_awready_i;
-  assign wready  = s_usr_wready_i;
-  assign bvalid  = s_usr_bvalid_i;
-  assign arready = s_usr_arready_i;
-  assign rvalid  = s_usr_rvalid_i;
+  assign awready = usr_awready_i;
+  assign wready  = usr_wready_i;
+  assign bvalid  = usr_bvalid_i;
+  assign arready = usr_arready_i;
+  assign rvalid  = usr_rvalid_i;
   // AXI has the following rules governing the use of bursts:
   // - a burst must not cross a 4KB address boundary
   typedef enum logic [1:0] {
@@ -147,106 +145,69 @@ module axi4_slv_fsm #(
     s_axi_req_d.addr = s_trans_nxt_addr;
     s_trans_cnt_d    = s_trans_cnt_q;
     // usr
-    s_usr_dat_o      = wdata;
-    s_usr_bm_o       = wstrb;
-    s_usr_wen_o      = 1'b0;
-    s_usr_en_o       = 1'b0;
-    s_usr_addr_o     = '0;
-    // axi4 request
-    // awready          = 1'b0;
-    // arready          = 1'b0;
-    // axi4 read
-    // rvalid           = 1'b0;
-    rdata            = s_usr_dat_i;
+    usr_dat_o        = wdata;
+    usr_bm_o         = wstrb;
+    usr_start_o      = '0;
+    usr_rdwr_start_o = '0;
+    usr_wen_o        = '0;
+    usr_wlen_o       = '0;
+    usr_addr_o       = '0;
+
+    rdata            = usr_dat_i;
     rresp            = '0;
     rlast            = '0;
     rid              = s_axi_req_q.id;
-    ruser            = 1'b0;
-    // axi4 write
-    // wready           = 1'b0;
-    // axi4 response
-    // bvalid           = 1'b0;
-    bresp            = 1'b0;
-    bid              = 1'b0;
-    buser            = 1'b0;
+    ruser            = '0;
+    bresp            = '0;
+    bid              = '0;
+    buser            = '0;
 
     case (s_state_q)
       IDLE: begin
         if (arvalid && arready) begin
           s_axi_req_d   = {arid, araddr, arlen, arsize, arburst};
+          usr_addr_o    = araddr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
+          usr_start_o   = 1'b1;
+          s_trans_cnt_d = 1;
           s_state_d     = READ;
-          //  we can request the first address, this saves us time
-          s_usr_en_o    = 1'b1;
-          s_usr_addr_o  = araddr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
-          s_trans_cnt_d = 1;
         end else if (awvalid && awready) begin
-          s_axi_req_d  = {awid, awaddr, awlen, awsize, awburst};
-          s_usr_addr_o = awaddr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
-          // we've got our first wvalid so start the write process
+          s_axi_req_d = {awid, awaddr, awlen, awsize, awburst};
+          usr_addr_o  = awaddr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
+          usr_start_o = 1'b1;
+          usr_wlen_o  = awlen;
           if (wvalid && wready) begin
-            s_usr_en_o    = 1'b1;
-            s_usr_wen_o   = 1'b1;
-
-            s_state_d     = (wlast) ? SEND_B : WRITE;
-            s_trans_cnt_d = 1;
-            // we still have to wait for the first wvalid to arrive
-          end else s_state_d = WAIT_WVALID;
-        end
-      end
-
-      // we are still missing a wvalid
-      WAIT_WVALID: begin
-        s_usr_addr_o = s_axi_req_q.addr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
-        // we can now make our first request
-        if (wvalid && wready) begin
-          s_usr_en_o    = 1'b1;
-          s_usr_wen_o   = 1'b1;
-          s_state_d     = (wlast) ? SEND_B : WRITE;
-          s_trans_cnt_d = 1;
+            usr_rdwr_start_o = 1'b1;
+            usr_wen_o        = 1'b1;
+            s_state_d        = (wlast) ? SEND_B : WRITE;
+          end else s_state_d = WRITE;
         end
       end
 
       READ: begin
-        // keep request to memory high
-        s_usr_en_o   = 1'b1;
-        s_usr_addr_o = s_axi_req_q.addr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
-        // send the response
-        rdata        = s_usr_dat_i;
-        rid          = s_axi_req_q.id;
-        rlast        = (s_trans_cnt_q == s_axi_req_q.len + 1);
-
-        // check that the master is ready, the axi4 must not wait on this
+        usr_addr_o = s_axi_req_q.addr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
+        rdata      = usr_dat_i;
+        rid        = s_axi_req_q.id;
+        rlast      = (s_trans_cnt_q == s_axi_req_q.len + 1);
         if (rready && rvalid) begin
-          // handle the correct burst type
+          usr_rdwr_start_o = 1'b1;
           case (s_axi_req_q.burst)
-            FIXED, INCR: s_usr_addr_o = s_axi_req_q.addr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
-            default:     s_usr_addr_o = '0;
+            FIXED, INCR: usr_addr_o = s_axi_req_q.addr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
+            default:     usr_addr_o = '0;
           endcase
-          // we need to change the address here for the upcoming request
-          // we sent the last byte -> go back to idle
-          if (rlast) begin
-            s_state_d  = IDLE;
-            // we already got everything
-            s_usr_en_o = 1'b0;
-          end
-          // we can decrease the counter as the master has consumed the read data
+          if (rlast) s_state_d = IDLE;
           s_trans_cnt_d = s_trans_cnt_q + 1;
         end
       end
 
       WRITE: begin
-        // consume a word here
+        usr_wlen_o = s_axi_req_q.len;
         if (wvalid && wready) begin
-          s_usr_en_o  = 1'b1;
-          s_usr_wen_o = 1'b1;
-          // handle the correct burst type
+          usr_rdwr_start_o = 1'b1;
+          usr_wen_o        = 1'b1;
           case (s_axi_req_q.burst)
-            FIXED, INCR: s_usr_addr_o = s_axi_req_q.addr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
-            default:     s_usr_addr_o = '0;
+            FIXED, INCR: usr_addr_o = s_axi_req_q.addr[USR_ADDR_WIDTH-1:`AXI4_DATA_BLOG];
+            default:     usr_addr_o = '0;
           endcase
-          // we can decrease the counter as the master has consumed the read data
-          s_trans_cnt_d = s_trans_cnt_q + 1;
-
           if (wlast) s_state_d = SEND_B;
         end
       end
@@ -256,7 +217,6 @@ module axi4_slv_fsm #(
       end
     endcase
   end
-
 
   dffr #(8) u_cnt_dffr (
       aclk,
