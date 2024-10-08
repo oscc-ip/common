@@ -181,8 +181,12 @@ module clk_int_div_simple #(
   // if div_i == 1, clk_o = clk_i / 2 chg on s_cnt_q == 0
   // if div_i == 2, clk_o = clk_i / 3 chg on s_cnt_q == 0
   // if div_i == 3, clk_o = clk_i / 4 chg on s_cnt_q == 1
-  assign clk_o   = div_i == 0 ? clk_i : s_clk_q;
-  assign s_clk_d = (s_cnt_q == (div_i - 1) / 2) || (s_cnt_q == div_i) ? ~s_clk_q : s_clk_q;
+  assign clk_o = div_i == 0 ? clk_i : s_clk_q;
+  always_comb begin
+    if (div_hdshk) s_clk_d = '0;
+    else if ((s_cnt_q == (div_i - 1) / 2) || (s_cnt_q == div_i)) s_clk_d = ~s_clk_q;
+    else s_clk_d = s_clk_q;
+  end
   dffr #(1) u_clk_dffr (
       clk_i,
       rst_n_i,
