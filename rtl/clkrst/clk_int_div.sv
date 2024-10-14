@@ -149,7 +149,8 @@ module clk_int_div_simple #(
     output logic                       div_ready_o,
     output logic                       div_done_o,
     output logic [DIV_VALUE_WIDTH-1:0] clk_cnt_o,
-    output logic                       clk_trg_o,
+    output logic                       clk_fir_trg_o,
+    output logic                       clk_sec_trg_o,
     output logic                       clk_o
 );
 
@@ -158,18 +159,16 @@ module clk_int_div_simple #(
   logic s_clk_d, s_clk_q;
   logic div_hdshk;
 
-  assign div_ready_o = 1'b1;
-  assign div_hdshk   = div_valid_i & div_ready_o;
-  assign clk_cnt_o   = s_cnt_q;
-  assign clk_trg_o   = s_cnt_q == div_i;
+  assign div_ready_o   = 1'b1;
+  assign div_hdshk     = div_valid_i & div_ready_o;
+  assign clk_cnt_o     = s_cnt_q;
+  assign clk_fir_trg_o = div_i == '0 ? '0 : s_cnt_q == (div_i - 1) / 2;
+  assign clk_sec_trg_o = div_i == '0 ? '0 : s_cnt_q == div_i;
 
   always_comb begin
     s_cnt_d = s_cnt_q + 1'b1;
-    if (div_hdshk) begin
-      s_cnt_d = '0;
-    end else if (s_cnt_q == div_i) begin
-      s_cnt_d = '0;
-    end
+    if (div_hdshk || div_i == '0) s_cnt_d = '0;
+    else if (clk_sec_trg_o) s_cnt_d = '0;
   end
   dffr #(DIV_VALUE_WIDTH) u_cnt_dffr (
       clk_i,
@@ -185,7 +184,7 @@ module clk_int_div_simple #(
   assign clk_o = div_i == 0 ? clk_i : s_clk_q;
   always_comb begin
     if (div_hdshk) s_clk_d = clk_init_i;
-    else if ((s_cnt_q == (div_i - 1) / 2) || (s_cnt_q == div_i)) s_clk_d = ~s_clk_q;
+    else if (clk_fir_trg_o || clk_sec_trg_o) s_clk_d = ~s_clk_q;
     else s_clk_d = s_clk_q;
   end
   dffr #(1) u_clk_dffr (
@@ -200,7 +199,7 @@ module clk_int_div_simple #(
     s_div_done_d = s_div_done_q;
     if (div_hdshk) begin
       s_div_done_d = '0;
-    end else if ((s_cnt_q == div_i) && s_div_done_q < {DONE_DELAY_WIDTH{1'b1}}) begin
+    end else if (clk_sec_trg_o && s_div_done_q < {DONE_DELAY_WIDTH{1'b1}}) begin
       s_div_done_d = s_div_done_q + 1'b1;
     end
   end
