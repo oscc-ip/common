@@ -145,6 +145,7 @@ module clk_int_div_simple #(
     input  logic                       rst_n_i,
     input  logic [DIV_VALUE_WIDTH-1:0] div_i,
     input  logic                       div_valid_i,
+    input  logic                       clk_init_i,
     output logic                       div_ready_o,
     output logic                       div_done_o,
     output logic [DIV_VALUE_WIDTH-1:0] clk_cnt_o,
@@ -183,7 +184,7 @@ module clk_int_div_simple #(
   // if div_i == 3, clk_o = clk_i / 4 chg on s_cnt_q == 1
   assign clk_o = div_i == 0 ? clk_i : s_clk_q;
   always_comb begin
-    if (div_hdshk) s_clk_d = '0;
+    if (div_hdshk) s_clk_d = clk_init_i;
     else if ((s_cnt_q == (div_i - 1) / 2) || (s_cnt_q == div_i)) s_clk_d = ~s_clk_q;
     else s_clk_d = s_clk_q;
   end
