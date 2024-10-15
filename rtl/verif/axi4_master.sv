@@ -151,7 +151,7 @@ task automatic AXI4Master::write(
   #`REGISTER_DELAY;
   this.axi4.awid    = id;
   this.axi4.awaddr  = addr;
-  this.axi4.awlen   = len - 1;
+  this.axi4.awlen   = len;
   this.axi4.awsize  = size;
   this.axi4.awburst = burst;
   this.axi4.awvalid = 1'b1;
@@ -172,11 +172,11 @@ task automatic AXI4Master::write(
   #`REGISTER_DELAY;
   // w burst channel
   tmp_addr = addr;
-  for (int i = 0; i < len; i++) begin
+  for (int i = 0; i < len + 1'd1; i++) begin
     this.axi4.wdata  = data.pop_front();
     this.axi4.wstrb  = this.calc_strb(tmp_addr, size);
     tmp_addr         = this.calc_addr(tmp_addr, size, burst);
-    this.axi4.wlast  = i == len - 1;
+    this.axi4.wlast  = i == len;
     this.axi4.wvalid = 1'b1;
     @(posedge this.axi4.aclk);
     while (~this.axi4.wready) begin
@@ -227,7 +227,7 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
   #`REGISTER_DELAY;
   this.axi4.arid    = id;
   this.axi4.araddr  = addr;
-  this.axi4.arlen   = len - 1;
+  this.axi4.arlen   = len;
   this.axi4.arsize  = size;
   this.axi4.arburst = burst;
   this.axi4.arvalid = 1'b1;
@@ -251,7 +251,7 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
   @(posedge this.axi4.aclk);
   #`REGISTER_DELAY;
   this.axi4.rready = 1'b1;
-  for (int i = 0; i < len; i++) begin
+  for (int i = 0; i < len + 1'd1; i++) begin
     @(posedge this.axi4.aclk);
     while (~this.axi4.rvalid) begin
       @(posedge this.axi4.aclk);
@@ -266,7 +266,7 @@ task automatic AXI4Master::read(input bit [`AXI4_ID_WIDTH-1:0] id,
       $error("%t [rd mismatch id] arid is %d, rid: %d", $time, id, this.axi4.rid);
     end
 
-    if (i == len - 1 && ~axi4.rlast) begin
+    if (i == len && ~axi4.rlast) begin
       $error("%t [rd error last]", $time, id);
     end else begin
       @(negedge this.axi4.aclk);
