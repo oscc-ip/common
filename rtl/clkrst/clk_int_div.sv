@@ -24,8 +24,9 @@
 `ifndef INC_CLK_INT_DIV_SV
 `define INC_CLK_INT_DIV_SV
 
+// div_val: 2 ^ DIV_VALUE_WIDTH
 module clk_int_even_div_static #(
-    parameter int DIV_VALUE = 2
+    parameter int DIV_VALUE_WIDTH = 2
 ) (
     input  logic clk_i,
     input  logic rst_n_i,
@@ -35,17 +36,10 @@ module clk_int_even_div_static #(
   //   $error("DIV_VALUE must be strictly larger than 0 and be even value");
   // end
 
-  localparam int DIV_VALUE_WIDTH = $clog2(DIV_VALUE) + 1;
   logic [DIV_VALUE_WIDTH-1:0] s_cnt_d, s_cnt_q;
   logic s_clk_d, s_clk_q;
 
-  always_comb begin
-    s_cnt_d = s_cnt_q + 1'b1;
-    if (s_cnt_q == DIV_VALUE / 2 - 1) begin
-      s_cnt_d = '0;
-    end
-  end
-
+  assign s_cnt_d = s_cnt_q + 1'b1;
   dffr #(DIV_VALUE_WIDTH) u_cnt_dffr (
       clk_i,
       rst_n_i,
@@ -53,13 +47,7 @@ module clk_int_even_div_static #(
       s_cnt_q
   );
 
-  always_comb begin
-    s_clk_d = s_clk_q;
-    if (s_cnt_q == DIV_VALUE / 2 - 1) begin
-      s_clk_d = ~s_clk_q;
-    end
-  end
-
+  assign s_clk_d = s_cnt_q[DIV_VALUE_WIDTH-1];
   dffr #(1) u_clk_dffr (
       clk_i,
       rst_n_i,
@@ -181,7 +169,7 @@ module clk_int_div_simple #(
   // if div_i == 1, clk_o = clk_i / 2 chg on s_cnt_q == 0
   // if div_i == 2, clk_o = clk_i / 3 chg on s_cnt_q == 0
   // if div_i == 3, clk_o = clk_i / 4 chg on s_cnt_q == 1
-  assign clk_o = div_i == 0 ? clk_i : s_clk_q;
+  assign clk_o = div_i == '0 ? clk_i : s_clk_q;
   always_comb begin
     if (div_hdshk) s_clk_d = clk_init_i;
     else if (clk_fir_trg_o || clk_sec_trg_o) s_clk_d = ~s_clk_q;
