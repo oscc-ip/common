@@ -8,8 +8,8 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_SETTING_SV
-`define INC_SETTING_SV
+`ifndef INC_SETTING_SVH
+`define INC_SETTING_SVH
 
 `define REGISTER_DELAY 0.1
 
