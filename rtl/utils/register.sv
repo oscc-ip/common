@@ -11,7 +11,7 @@
 `ifndef INC_REGISTER_SV
 `define INC_REGISTER_SV
 
-`include "setting.sv"
+`include "config.svh"
 
 module dff #(
     parameter int DATA_WIDTH = 1
@@ -131,6 +131,16 @@ module dffl #(
       dat_o <= #`REGISTER_DELAY dat_i;
     end
   end
+
+`ifndef SV_ASSRT_DISABLE
+  xchecker #(
+      .DATA_WIDTH(1)
+  ) u_xchecker (
+      clk_i,
+      en_i
+  );
+`endif
+
 endmodule
 
 module dffer #(
@@ -150,6 +160,16 @@ module dffer #(
       dat_o <= #`REGISTER_DELAY dat_i;
     end
   end
+
+`ifndef SV_ASSRT_DISABLE
+  xchecker #(
+      .DATA_WIDTH(1)
+  ) u_xchecker (
+      clk_i,
+      en_i
+  );
+`endif
+
 endmodule
 
 module dfferh #(
@@ -169,6 +189,16 @@ module dfferh #(
       dat_o <= #`REGISTER_DELAY dat_i;
     end
   end
+
+`ifndef SV_ASSRT_DISABLE
+  xchecker #(
+      .DATA_WIDTH(1)
+  ) u_xchecker (
+      clk_i,
+      en_i
+  );
+`endif
+
 endmodule
 
 module dfferc #(
@@ -189,6 +219,16 @@ module dfferc #(
       dat_o <= #`REGISTER_DELAY dat_i;
     end
   end
+
+`ifndef SV_ASSRT_DISABLE
+  xchecker #(
+      .DATA_WIDTH(1)
+  ) u_xchecker (
+      clk_i,
+      en_i
+  );
+`endif
+
 endmodule
 
 module dffesr #(
@@ -208,6 +248,16 @@ module dffesr #(
       dat_o <= #`REGISTER_DELAY dat_i;
     end
   end
+
+`ifndef SV_ASSRT_DISABLE
+  xchecker #(
+      .DATA_WIDTH(1)
+  ) u_xchecker (
+      clk_i,
+      en_i
+  );
+`endif
+
 endmodule
 
 `endif
