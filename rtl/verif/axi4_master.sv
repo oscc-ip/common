@@ -11,7 +11,7 @@
 `ifndef INC_AXI4_MASTER_SV
 `define INC_AXI4_MASTER_SV
 
-`include "setting.sv"
+`include "config.svh"
 `include "helper.sv"
 `include "test_base.sv"
 `include "axi4_define.sv"

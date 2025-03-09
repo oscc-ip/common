@@ -11,7 +11,7 @@
 `ifndef INC_TECH_RAM_SV
 `define INC_TECH_RAM_SV
 
-`include "setting.sv"
+`include "config.svh"
 
 // this file only include behavioral model, for ASIC tape-out need to reimplement those models
 module tech_ram #(

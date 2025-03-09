@@ -12,6 +12,7 @@
 `define INC_REGISTER_SV
 
 `include "config.svh"
+`include "xchecker.sv"
 
 module dff #(
     parameter int DATA_WIDTH = 1

@@ -26,7 +26,7 @@
 `ifndef INC_CDC_TWOPHASE_SV
 `define INC_CDC_TWOPHASE_SV
 
-`include "setting.sv"
+`include "config.svh"
 `include "register.sv"
 `include "cdc_sync.sv"
 
