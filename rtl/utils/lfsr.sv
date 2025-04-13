@@ -27,13 +27,13 @@ module lfsr_galois #(
 );
 
   logic [DATA_WIDTH-1:0] s_shift_d, s_shift_q;
-  for (genvar i = 0; i < DATA_WIDTH; i++) begin : LFSR_GALOIS_BLOCK
-    if (i == DATA_WIDTH - 1) begin
+  for (genvar i = 0; i < DATA_WIDTH; i++) begin
+    if (i == DATA_WIDTH - 1) begin : LFSR_GALOIS_LAST_BLOCK
       assign s_shift_d[i] = wr_i ? dat_i[i] : s_shift_q[0];
-    end else begin
-      if (POLY & (1 << i)) begin
+    end else begin : LFSR_GALOIS_NLAST_BLOCK
+      if (POLY & (1 << i)) begin : LFSR_GALOIS_HVALUE_BLOCK
         assign s_shift_d[i] = wr_i ? dat_i[i] : s_shift_q[i+1] ^ s_shift_q[0];
-      end else begin
+      end else begin : LFSR_GALOIS_NHVALUE_BLOCK
         assign s_shift_d[i] = wr_i ? dat_i[i] : s_shift_q[i+1];
       end
     end

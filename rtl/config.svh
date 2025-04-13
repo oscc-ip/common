@@ -11,6 +11,6 @@
 `ifndef INC_CONFIG_SVH
 `define INC_CONFIG_SVH
 
-`define REGISTER_DELAY 0.1
+`define REGISTER_DELAY 0.0
 
 `endif

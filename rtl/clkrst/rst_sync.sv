@@ -20,15 +20,15 @@ module rst_sync #(
 );
 
   logic [STAGE-1:0] s_rst_sync;
-  for (genvar i = 0; i < STAGE; i++) begin : RST_SYNC_BLOCK
-    if (i == 0) begin
+  for (genvar i = 0; i < STAGE; i++) begin
+    if (i == 0) begin : RST_SYNC_0_BLOCK
       dffr #(1) u_sync_dffr (
           clk_i,
           rst_n_i,
           1'b1,
           s_rst_sync[0]
       );
-    end else begin
+    end else begin : RST_SYNC_N0_BLOCK
       dffr #(1) u_sync_dffr (
           clk_i,
           rst_n_i,
