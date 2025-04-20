@@ -8,11 +8,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_LFSR_SV
-`define INC_LFSR_SV
-
-`include "register.sv"
-
 //https://en.wikipedia.org/wiki/Linear-feedback_shift_register
 // MSB -> LSB [DATA_WIDTH-1:0]
 module lfsr_galois #(
@@ -81,4 +76,3 @@ module lfsr_fibonacci #(
   );
 
 endmodule
-`endif

@@ -24,14 +24,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_CDC_FIFO_SV
-`define INC_CDC_FIFO_SV
-
-`include "register.sv"
-`include "cdc_sync.sv"
-`include "bin2gray.sv"
-`include "gray2bin.sv"
-
 // verilog_format: off
 (* no_ungroup *)
 (* no_boundary_optimization *)
@@ -244,4 +236,3 @@ module cdc_fifo_dst #(
       .data_o (data_o)
   );
 endmodule
-`endif

@@ -23,12 +23,7 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_CDC_TWOPHASE_SV
-`define INC_CDC_TWOPHASE_SV
-
 `include "config.svh"
-`include "register.sv"
-`include "cdc_sync.sv"
 
 module cdc_2phase #(
     parameter int DATA_WIDTH = 32
@@ -177,4 +172,3 @@ module cdc_2phase_dst #(
   assign async_ack_o = s_ack_dst_q;
 
 endmodule
-`endif

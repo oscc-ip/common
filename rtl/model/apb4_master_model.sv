@@ -8,8 +8,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`include "helper.sv"
-
 module apb4_master_model (
     apb4_if.master apb4
 );

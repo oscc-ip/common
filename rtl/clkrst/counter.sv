@@ -20,11 +20,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_COUNTER_SV
-`define INC_COUNTER_SV
-
-`include "register.sv"
-
 module counter #(
     parameter int DATA_WIDTH = 4
 ) (
@@ -96,4 +91,3 @@ module delta_counter #(
   );
 
 endmodule
-`endif

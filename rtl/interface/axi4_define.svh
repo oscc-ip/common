@@ -8,8 +8,8 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_AXI4_DEF_SV
-`define INC_AXI4_DEF_SV
+`ifndef INC_AXI4_DEF_SVH
+`define INC_AXI4_DEF_SVH
 
 // verilog_format: off
 `define AXI4_ADDR_WIDTH          32

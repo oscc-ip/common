@@ -8,9 +8,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_REGFILE_SV
-`define INC_REGFILE_SV
-
 `include "config.svh"
 
 // this file only include behavioral model, for ASIC tape-out need to reimplement those models
@@ -78,5 +75,3 @@ module tech_regfile_bm #(
   end
 `endif
 endmodule
-
-`endif

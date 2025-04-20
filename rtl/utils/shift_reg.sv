@@ -8,11 +8,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_SHIFT_REG_SV
-`define INC_SHIFT_REG_SV
-
-`include "register.sv"
-
 // verilog_format: off
 `define SHIFT_REG_TYPE_ARICH 2'b00
 `define SHIFT_REG_TYPE_LOGIC 2'b01
@@ -89,5 +84,3 @@ module shift_reg #(
       s_sf_q
   );
 endmodule
-
-`endif

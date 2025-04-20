@@ -8,10 +8,7 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_AXI4_IF_SV
-`define INC_AXI4_IF_SV
-
-`include "axi4_define.sv"
+`include "axi4_define.svh"
 
 interface axi4_if (
     input logic aclk,
@@ -175,5 +172,3 @@ interface axi4_if (
   );
 
 endinterface
-
-`endif

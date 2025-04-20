@@ -8,9 +8,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_TEST_BASE_SV
-`define INC_TEST_BASE_SV
-
 class TestBase;
   string name;
   extern function new(string name = "test_base");
@@ -19,5 +16,3 @@ endclass
 function TestBase::new(string name);
   this.name = name;
 endfunction
-
-`endif

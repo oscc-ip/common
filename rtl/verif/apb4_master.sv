@@ -8,12 +8,7 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_APB4_MASTER_SV
-`define INC_APB4_MASTER_SV
-
 `include "config.svh"
-`include "helper.sv"
-`include "test_base.sv"
 
 class APB4Master extends TestBase;
   string                        name;
@@ -142,5 +137,3 @@ endtask
 task automatic APB4Master::test_irq();
   $display("=== [test irq] ===");
 endtask
-
-`endif

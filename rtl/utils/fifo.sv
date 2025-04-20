@@ -8,12 +8,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_FIFO_SV
-`define INC_FIFO_SV
-
-`include "register.sv"
-`include "regfile.sv"
-
 //NOTE: buffer depth need to be 2^x val
 module fifo #(
     parameter int DATA_WIDTH       = 32,
@@ -199,4 +193,3 @@ module stream_fifo #(
   );
 
 endmodule
-`endif

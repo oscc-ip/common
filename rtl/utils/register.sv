@@ -8,11 +8,7 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_REGISTER_SV
-`define INC_REGISTER_SV
-
 `include "config.svh"
-`include "xchecker.sv"
 
 module dff #(
     parameter int DATA_WIDTH = 1
@@ -260,5 +256,3 @@ module dffesr #(
 `endif
 
 endmodule
-
-`endif

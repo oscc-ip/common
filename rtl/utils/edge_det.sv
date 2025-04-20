@@ -9,12 +9,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_EDGE_DET_SV
-`define INC_EDGE_DET_SV
-
-`include "register.sv"
-`include "cdc_sync.sv"
-
 // need to use high freq clk to oversample the dat edge with sync
 module edge_det #(
     parameter int STAGE      = 2,
@@ -168,4 +162,3 @@ module edge_det_sync_fe #(
 
   assign fe_o = s_dat_q & (~s_dat_d);
 endmodule
-`endif

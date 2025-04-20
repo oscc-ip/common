@@ -8,14 +8,7 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_APB4_AXI4_MASTER_SV
-`define INC_APB4_AXI4_MASTER_SV
-
 `include "config.svh"
-`include "helper.sv"
-`include "test_base.sv"
-`include "apb4_master.sv"
-`include "axi4_master.sv"
 
 class APB4AXI4Master extends TestBase;
   string     name;
@@ -120,5 +113,3 @@ task automatic APB4AXI4Master::axi4_rd_check(
     input Helper::cmp_t cmp_type, input Helper::log_lev_t log_level = Helper::NORM);
   this.axi4_mstr.rd_check(id, addr, len, size, burst, ref_data, cmp_type, log_level);
 endtask
-
-`endif

@@ -10,9 +10,6 @@
 
 // this file only include behavioral model, for ASIC tape-out need to reimplement those models
 
-`ifndef INC_PLL_SV
-`define INC_PLL_SV
-
 module tech_pll #(
 ) (
     input  logic        fref_i,
@@ -31,5 +28,3 @@ module tech_pll #(
   assign pll_clk_o  = fref_i;
 `endif
 endmodule
-
-`endif

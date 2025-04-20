@@ -21,9 +21,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_CLK_INT_DIV_SV
-`define INC_CLK_INT_DIV_SV
-
 // div_val: 2 ^ DIV_VALUE_WIDTH
 module clk_int_even_div_static #(
     parameter int DIV_VALUE_WIDTH = 2
@@ -214,4 +211,3 @@ module clk_int_even_div #(
 );
 
 endmodule
-`endif

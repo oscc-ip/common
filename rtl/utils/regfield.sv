@@ -16,11 +16,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_REG_FIELD_SV
-`define INC_REG_FIELD_SV
-
-`include "register.sv"
-
 module regfield #(
     parameter                        DATA_WIDTH = 32,
     parameter                        SW_ACS     = "rw",  // rw, ro, wo, w1c, w1s, w0c, rc
@@ -91,5 +86,3 @@ module regfield #(
   );
 
 endmodule
-
-`endif

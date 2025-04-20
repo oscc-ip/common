@@ -8,9 +8,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_RST_SYNC_SV
-`define INC_RST_SYNC_SV
-
 module rst_sync #(
     parameter int STAGE = 3
 ) (
@@ -41,5 +38,3 @@ module rst_sync #(
   assign rst_n_o = s_rst_sync[STAGE-1];
 
 endmodule
-
-`endif

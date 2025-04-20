@@ -8,9 +8,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_HELPER_SV
-`define INC_HELPER_SV
-
 class Helper;
   typedef enum {
     NORM  = 0,
@@ -122,5 +119,3 @@ class Helper;
              expected);
   endtask
 endclass
-
-`endif

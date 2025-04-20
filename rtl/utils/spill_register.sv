@@ -23,9 +23,6 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_SPILL_REGISTER_SV
-`define INC_SPILL_REGISTER_SV
-
 module spill_register #(
     parameter int DATA_WIDTH = 32,
     parameter bit BYPASS     = 1'b0  // transparent
@@ -90,4 +87,3 @@ module spill_register #(
     assign data_o    = r_b_full ? r_b_data : r_a_data;
   end
 endmodule
-`endif

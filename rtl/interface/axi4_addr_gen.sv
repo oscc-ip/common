@@ -8,10 +8,7 @@
 // MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 
-`ifndef INC_AXI4_ADDR_GEN_SV
-`define INC_AXI4_ADDR_GEN_SV
-
-`include "axi4_define.sv"
+`include "axi4_define.svh"
 
 module axi4_addr_gen (
     input  logic [                     7:0] alen_i,
@@ -54,5 +51,3 @@ module axi4_addr_gen (
 
   assign addr_o = aburst_i == `AXI4_BURST_TYPE_FIXED ? addr_i : s_res_addr;
 endmodule
-
-`endif
